@@ -1,41 +1,54 @@
 import AppLayout from "@/layouts/app-layout";
 import React, { useState } from "react";
 import { Head, router } from "@inertiajs/react";
-import { tenant, kategorisub, menu } from "../models";
-import { formatNumber } from "../functions";
+import { Barang, Kategori, Kategorisub } from "../models";
+import { formatDigit } from "@/pages/components/helpers";
 
 interface Props {
-    tenant: tenant[];
-    kategorisub: kategorisub[];
+    kategori: Kategori[];
 }
 
-const initialFormData: menu = {
+const initialFormData: Barang = {
     id: 0,
-    sku: "",
-    tenant_id: 0,
-    kategorisub_id: 0,
-    alias: "",
     deskripsi: "",
-    harga: 0,
-    is_ready: true,
-    is_soldout: false,
+    kategori_id: 0,
+    kategorisub_id: 0,
+    stok: 0,
+    min_stok: 0,
+    satuan: "",
+    isi: 0,
+    harga_beli: 0,
+    harga_jual: 0,
 };
 
-const Create: React.FC<Props> = ({ tenant, kategorisub }) => {
+const Create: React.FC<Props> = ({ kategori }) => {
     const breadcrumbs = [
         {
-            title: "Tambah Menu",
-            href: "/foodcourt/menu"
+            title: "Tambah Barang",
+            href: "/inventory/barang/create",
         },
     ];
 
-    const [formData, setFormData] = useState<menu>(initialFormData);
+    const [formData, setFormData] = useState<Barang>(initialFormData);
 
-    const handleChangeHarga = (value: string) => {
+    const [kategorisub, setKategorisub] = useState<Kategorisub[]>([]);
+
+    const handleKategoriChange = (kategoriId: string) => {
+        const selectedKategoriId = parseInt(kategoriId, 10);
+        setFormData({ ...formData, kategori_id: selectedKategoriId, kategorisub_id: 0 });
+
+        const filteredSubkategori = kategori
+            .find((k) => k.id === selectedKategoriId)
+            ?.kategorisubs || [];
+
+        setKategorisub(filteredSubkategori);
+    }
+
+    const handleChangeMinStok = (value: string) => {
         // Remove non-numeric characters and remove leading zeros
         const numericValue = value.replace(/\D/g, '').replace(/^0+/, '');
 
-        setFormData({ ...formData, harga: numericValue ? parseInt(numericValue) : 0 });
+        setFormData({ ...formData, min_stok: numericValue ? parseInt(numericValue) : 0 });
     };
 
     const [submitting, setSubmitting] = useState(false);
@@ -43,30 +56,18 @@ const Create: React.FC<Props> = ({ tenant, kategorisub }) => {
     const [success, setSuccess] = useState(false);
 
     const handleSubmit = async () => {
-        if (formData.sku.trim() === "") {
-            // konfirmasi jika sku kosong
-            if (!confirm("SKU kosong, lanjutkan dengan SKU otomatis oleh sistem ?")) {
-                return;
-            }
+        if (formData.kategori_id === 0) {
+            setError("Silahkan pilih Kategori..");
+            return;
         }
 
         if (formData.kategorisub_id === 0) {
-            setError("Silahkan pilih Sub-kategori..");
+            setError("Silahkan pilih Sub-Kategori..");
             return;
         }
 
-        if (formData.tenant_id === 0) {
-            setError("Silahkan pilih Tenant..");
-            return;
-        }
-
-        if (formData.alias.trim() === "") {
-            setError("Silahkan isi Alias / Nama Menu..");
-            return;
-        }
-
-        if (formData.harga <= 0) {
-            setError("Harga harus lebih dari 0..");
+        if (formData.deskripsi.trim() === "") {
+            setError("Deskripsi tidak boleh kosong.");
             return;
         }
 
@@ -76,17 +77,14 @@ const Create: React.FC<Props> = ({ tenant, kategorisub }) => {
 
         try {
             const payload = {
-                sku: formData.sku.trim() === "" ? null : formData.sku,
-                tenant_id: formData.tenant_id,
-                kategorisub_id: formData.kategorisub_id,
-                alias: formData.alias,
                 deskripsi: formData.deskripsi,
-                harga: formData.harga,
-                is_ready: formData.is_ready ? 1 : 0,
-                is_soldout: formData.is_soldout ? 1 : 0
+                kategori_id: formData.kategori_id,
+                kategorisub_id: formData.kategorisub_id,
+                satuan: formData.satuan,
+                min_stok: formData.min_stok,
             };
 
-            router.post(route("foodcourt.menu.store"), payload, {
+            router.post(route("inventory.barang.store"), payload, {
                 onSuccess: () => {
                     setSuccess(true);
                     setFormData(initialFormData);
@@ -122,25 +120,37 @@ const Create: React.FC<Props> = ({ tenant, kategorisub }) => {
 
             <div className="container mx-auto max-w-xl p-2">
                 <div className="mb-6 flex flex-row items-center pt-2">
-                    <h1 className="text-xl font-bold">Tambah Menu</h1>
+                    <h1 className="text-xl font-bold">Tambah Barang Baru</h1>
                 </div>
 
                 <div className="space-y-4 bg-gray-200 p-4 rounded shadow">
 
                     <div className="flex flex-wrap justify-center gap-4 py-4 px-2 bg-gray-100 dark:bg-gray-700 rounded-lg border-2 border-black dark:border-gray-600">
 
-                        {/* Select Tenant */}
+                        {/* Deskripsi */}
                         <div className="flex flex-col w-full">
-                            <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 pl-1">Tenant</label>
+                            <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 pl-1">
+                                Deskripsi
+                            </label>
+                            <input
+                                value={formData.deskripsi}
+                                onChange={(e) => setFormData({ ...formData, deskripsi: e.target.value })}
+                                className="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-white p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                        </div>
+
+                        {/* Select Kategori */}
+                        <div className="flex flex-col w-full">
+                            <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 pl-1">Kategori</label>
                             <select
-                                value={formData.tenant_id}
-                                onChange={(e) => setFormData({ ...formData, tenant_id: +e.target.value })}
+                                value={formData.kategori_id}
+                                onChange={(e) => handleKategoriChange(e.target.value)}
                                 className="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-white p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                             >
-                                <option value={0}>-- Select Tenant --</option>
-                                {tenant.map((v) => (
+                                <option value={0}>-- Pilih Kategori --</option>
+                                {kategori.map((v) => (
                                     <option key={v.id} value={v.id}>
-                                        {v.nama_tenant}
+                                        {v.ket}
                                     </option>
                                 ))}
                             </select>
@@ -154,7 +164,7 @@ const Create: React.FC<Props> = ({ tenant, kategorisub }) => {
                                 onChange={(e) => setFormData({ ...formData, kategorisub_id: +e.target.value })}
                                 className="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-white p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                             >
-                                <option value={0}>-- Select Sub-Kategori --</option>
+                                <option value={0}>-- Pilih Sub-Kategori --</option>
                                 {kategorisub.map((v) => (
                                     <option key={v.id} value={v.id}>
                                         {v.ket}
@@ -163,77 +173,27 @@ const Create: React.FC<Props> = ({ tenant, kategorisub }) => {
                             </select>
                         </div>
 
-                        {/* SKU */}
+                        {/* Satuan */}
                         <div className="flex flex-col">
                             <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 pl-1">
-                                SKU <span className="italic text-xs">(kosong = otomatis)</span>
+                                Satuan <span className="italic text-xs">(max. 20 karakter)</span>
                             </label>
                             <input
                                 type="text"
-                                placeholder="12345678"
-                                value={formData.sku}
-                                onChange={(e) => setFormData({ ...formData, sku: e.target.value })}
+                                value={formData.satuan}
+                                onChange={(e => setFormData({ ...formData, satuan: e.target.value }))}
                                 className="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-white p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                             />
                         </div>
 
-                        {/* Alias */}
+                        {/* Min. Stok */}
                         <div className="flex flex-col">
-                            <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 pl-1">
-                                Alias <span className="italic text-xs">(max. 20 karakter)</span>
-                            </label>
+                            <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 pl-1">Minimum Stok</label>
                             <input
                                 type="text"
-                                value={formData.alias}
-                                onChange={(e => setFormData({ ...formData, alias: e.target.value }))}
+                                value={formatDigit(formData.min_stok, 0)}
+                                onChange={(e) => handleChangeMinStok(e.target.value)}
                                 className="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-white p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            />
-                        </div>
-
-                        {/* Deskripsi */}
-                        <div className="flex flex-col">
-                            <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 pl-1">Deskripsi</label>
-                            <input
-                                type="text"
-                                value={formData.deskripsi}
-                                onChange={(e => setFormData({ ...formData, deskripsi: e.target.value }))}
-                                className="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-white p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            />
-                        </div>
-
-                        {/* Harga */}
-                        <div className="flex flex-col">
-                            <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 pl-1">Harga Rp.</label>
-                            <input
-                                type="text"
-                                value={formatNumber(formData.harga, 0)}
-                                onChange={(e) => handleChangeHarga(e.target.value)}
-                                className="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-white p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            />
-                        </div>
-                    </div>
-
-                    <div className="flex flex-wrap justify-center gap-4 py-4 px-2 bg-gray-100 dark:bg-gray-700 rounded-lg border-2 border-black dark:border-gray-600">
-
-                        {/* Is Ready */}
-                        <div className="flex flex-col justify-center items-center">
-                            <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 pl-1">Ready</label>
-                            <input
-                                type="checkbox"
-                                checked={formData.is_ready}
-                                onChange={(e) => setFormData({ ...formData, is_ready: e.target.checked })}
-                                className="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                            />
-                        </div>
-
-                        {/* Is Sold Out */}
-                        <div className="flex flex-col justify-center items-center">
-                            <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 pl-1">Sold Out</label>
-                            <input
-                                type="checkbox"
-                                checked={formData.is_soldout}
-                                onChange={(e) => setFormData({ ...formData, is_soldout: e.target.checked })}
-                                className="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                             />
                         </div>
                     </div>

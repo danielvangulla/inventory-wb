@@ -32,6 +32,7 @@ export interface Kategori {
     id: number;
     ket: string;
     urut: number;
+    kategorisubs?: Kategorisub[];
 }
 
 export interface Kategorisub {
@@ -42,17 +43,17 @@ export interface Kategorisub {
     kategori?: Kategori;
 }
 
-export interface menu {
+export interface Barang {
     id: number;
-    sku: string;
-    tenant_id: number;
-    kategorisub_id: number;
-    alias: string;
     deskripsi: string;
-    harga: number;
-    is_ready: boolean;
-    is_soldout: boolean;
+    kategori_id: number;
+    kategorisub_id: number;
+    stok: number;
+    min_stok: number;
+    satuan: string;
+    isi: number;
+    harga_beli: number;
+    harga_jual: number;
+    kategori?: Kategori;
     kategorisub?: Kategorisub;
-    qty?: number;
-    total?: number;
 }

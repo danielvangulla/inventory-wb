@@ -2,19 +2,18 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Builder;
 
-class Kategori extends Model
+class Supplier extends Model
 {
-    use SoftDeletes;
-
-    protected $table = 'kategoris';
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'ket',
-        'urut',
+        'nama',
+        'alamat',
     ];
 
     protected $hidden = [
@@ -23,16 +22,11 @@ class Kategori extends Model
         'deleted_at',
     ];
 
-    // default order by urut, id
     protected static function booted()
     {
         static::addGlobalScope('urut', function (Builder $builder) {
-            $builder->orderBy('urut')->orderBy('id');
+            $builder->orderBy('nama', 'asc');
         });
     }
 
-    public function kategorisubs()
-    {
-        return $this->hasMany(Kategorisub::class, 'kategori_id');
-    }
 }

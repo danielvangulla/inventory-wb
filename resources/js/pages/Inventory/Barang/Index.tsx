@@ -2,49 +2,46 @@ import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { Edit, Search, Trash2 } from 'lucide-react';
-import { menu } from '../models';
 import { useState } from 'react';
-import { formatNumber } from '../functions';
+import { Barang } from '../models';
+import { formatDigit } from '@/pages/components/helpers';
 
 interface Props {
-    menu: menu[];
+    barang: Barang[];
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'DAFTAR MENU',
-        href: '/foodcourt/menu',
+        title: 'DAFTAR BARANG',
+        href: '/inventory/barang',
     },
 ];
 
-const Index: React.FC<Props> = ({ menu }) => {
+const Index: React.FC<Props> = ({ barang }) => {
     const { props } = usePage<{ userLevel: { is_admin: boolean } }>();
     const level = props.userLevel;
 
-    const [filteredMenu, setFilteredMenu] = useState<menu[]>(menu);
+    const [filteredBarang, setFilteredBarang] = useState<Barang[]>(barang);
 
     const handleSearch = (query: string) => {
-        // Filter the menu based on the search query by alias, deskripsi, kategori
-        const filtered = menu.filter(item =>
-            item.tenant?.nama_tenant.toLowerCase().includes(query.toLowerCase()) ||
-            item.sku.toLowerCase().includes(query.toLowerCase()) ||
-            item.alias.toLowerCase().includes(query.toLowerCase()) ||
+        // Filter the barang based on the search query by deskripsi, harga, kategori
+        const filtered = barang.filter(item =>
             item.deskripsi.toLowerCase().includes(query.toLowerCase()) ||
-            item.harga.toString().toLowerCase().includes(query.toLowerCase()) ||
+            item.kategori?.ket.toLowerCase().includes(query.toLowerCase()) ||
             item.kategorisub?.ket.toLowerCase().includes(query.toLowerCase())
         );
 
-        setFilteredMenu(filtered);
+        setFilteredBarang(filtered);
     };
 
     const handleDelete = (id: number) => {
-        const ket = menu.find(t => t.id === id)?.alias || 'this menu';
+        const ket = barang.find(t => t.id === id)?.deskripsi || 'this barang';
 
         if (confirm(`Hapus Menu ${ket} ?`)) {
-            router.delete(route('foodcourt.menu.destroy', id));
+            router.delete(route('inventory.barang.destroy', id));
 
             // Optionally, remove the deleted item from the filtered list
-            setFilteredMenu(prev => prev.filter(item => item.id !== id));
+            setFilteredBarang(prev => prev.filter(item => item.id !== id));
         }
     }
 
@@ -57,10 +54,10 @@ const Index: React.FC<Props> = ({ menu }) => {
 
                     <div className="mb-2">
                         <Link
-                            href={route('foodcourt.menu.create')}
+                            href={route('inventory.barang.create')}
                             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
                         >
-                            Add Menu
+                            Tambah Barang
                         </Link>
                     </div>
 
@@ -71,7 +68,7 @@ const Index: React.FC<Props> = ({ menu }) => {
                         <input
                             type="text"
                             onChange={(e) => handleSearch(e.target.value)}
-                            placeholder="Cari Menu..."
+                            placeholder="Cari Deskripsi / Kategori..."
                             className="w-full pl-10 pr-4 py-2 rounded-md border-2 border-gray-500 dark:border-gray-300 dark:bg-gray-800 text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
                     </div>
@@ -82,18 +79,16 @@ const Index: React.FC<Props> = ({ menu }) => {
                         <thead>
                             <tr className="bg-gray-200 dark:bg-gray-700 border border-gray-300 dark:border-gray-600">
                                 <th className="py-2 px-2 text-center border border-black dark:border-gray-400">#</th>
-                                <th className="py-2 px-2 text-center border border-black dark:border-gray-400">Tenant</th>
-                                <th className="py-2 px-2 text-center border border-black dark:border-gray-400">SKU</th>
-                                <th className="py-2 px-2 text-center border border-black dark:border-gray-400">Alias / Deskripsi</th>
                                 <th className="py-2 px-2 text-center border border-black dark:border-gray-400">Kategori / Subkat</th>
-                                <th className="py-2 px-2 text-center border border-black dark:border-gray-400">Harga</th>
-                                <th className="py-2 px-2 text-center border border-black dark:border-gray-400">Ready</th>
+                                <th className="py-2 px-2 text-center border border-black dark:border-gray-400">Deskripsi</th>
                                 <th className="py-2 px-2 text-center border border-black dark:border-gray-400">Stok</th>
+                                <th className="py-2 px-2 text-center border border-black dark:border-gray-400">Harga Beli <br />(Average)</th>
+                                <th className="py-2 px-2 text-center border border-black dark:border-gray-400">Min. Stok</th>
                                 <th className="py-2 px-2 text-center border border-black dark:border-gray-400">Act.</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {filteredMenu.length === 0 && (
+                            {filteredBarang.length === 0 && (
                                 <tr>
                                     <td colSpan={8} className="py-2 px-2 text-center border border-black dark:border-gray-400">
                                         Tidak ada data...
@@ -101,58 +96,28 @@ const Index: React.FC<Props> = ({ menu }) => {
                                 </tr>
                             )}
 
-                            {filteredMenu.length > 0 && filteredMenu.map((v, index) => (
+                            {filteredBarang.length > 0 && filteredBarang.map((v, index) => (
                                 <tr key={v.id} className='hover:bg-blue-300 dark:hover:bg-gray-600'>
                                     <td className="py-2 px-2 text-center border border-black dark:border-gray-400">{index + 1}</td>
-                                    <td className="py-2 px-2 text-left border border-black dark:border-gray-400">{v.tenant?.nama_tenant || '-'}</td>
-                                    <td className="py-2 px-2 text-center border border-black dark:border-gray-400">{v.sku || ''}</td>
-                                    <td className="py-2 px-2 text-left border border-black dark:border-gray-400">
-                                        <span className='italic font-bold'>{v.alias}</span>
-                                        <br />
-                                        {v.deskripsi}
+                                    <td className="py-2 px-2 border border-black dark:border-gray-400">
+                                        {v.kategori ? v.kategori.ket : '-'} <br />
+                                        {v.kategorisub ? `${v.kategorisub.ket}` : ''}
                                     </td>
-                                    <td className="py-2 px-2 text-left border border-black dark:border-gray-400">
-                                        {v.kategorisub?.kategori?.ket || '-'} /
-                                        <br />
-                                        {v.kategorisub?.ket || '-'}
-                                    </td>
-                                    <td className="py-2 px-2 text-right border border-black dark:border-gray-400">{formatNumber(v.harga, 0)}</td>
-                                    <td className="py-2 px-2 text-center border border-black dark:border-gray-400">
-                                        {v.is_ready ?
-                                            // checkmark icon
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-green-500 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                                            </svg>
-                                        :
-                                            // cross icon
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-red-500 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                                            </svg>
-                                        }
-                                    </td>
-                                    <td className="py-2 px-2 text-center border border-black dark:border-gray-400">
-                                        {v.is_soldout ?
-                                            // cross icon
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-red-500 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                                            </svg>
-                                        :   // checkmark icon
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-green-500 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                                            </svg>
-                                        }
-                                    </td>
+                                    <td className="py-2 px-2 border border-black dark:border-gray-400">{v.deskripsi}</td>
+                                    <td className="py-2 px-2 text-center border border-black dark:border-gray-400">{v.stok}</td>
+                                    <td className="py-2 px-2 text-right border border-black dark:border-gray-400">{formatDigit(v.harga_beli, 0)}</td>
+                                    <td className="py-2 px-2 text-center border border-black dark:border-gray-400">{v.min_stok}</td>
                                     <td className="py-2 px-1 text-center border border-black dark:border-gray-400">
                                         <div className='flex flex-row justify-center gap-1'>
                                         <Link
-                                            title={`Edit ${v.alias}`}
-                                            href={route('foodcourt.menu.edit', v.id)}
+                                            title={`Edit ${v.deskripsi}`}
+                                            href={route('inventory.barang.edit', v.id)}
                                             className="text-blue-500 hover:text-blue-700 cursor-pointer">
                                             <Edit size={16} />
                                         </Link>
 
                                         {level.is_admin && <button
-                                            title={`Hapus ${v.alias}`}
+                                            title={`Hapus ${v.deskripsi}`}
                                             onClick={() => handleDelete(v.id)}
                                             className="text-red-500 hover:text-red-700 cursor-pointer">
                                             <Trash2 size={16} />

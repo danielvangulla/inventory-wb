@@ -78,8 +78,8 @@ export function AppSidebar() {
                     icon: ArrowBigRightDash,
                 },
                 {
-                    title: 'Daftar Menu',
-                    href: '/inventory/menu',
+                    title: 'Daftar Barang',
+                    href: '/inventory/barang',
                     icon: ArrowBigRightDash,
                 },
             ],

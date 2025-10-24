@@ -1,13 +1,13 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\Inventory\BarangController;
 use App\Http\Controllers\Inventory\KategoriController;
 use App\Http\Controllers\Inventory\KategorisubController;
 use App\Http\Controllers\Inventory\LandingController;
 use App\Http\Controllers\SetupController;
 use App\Http\Controllers\UserLevelController;
 use App\Http\Controllers\UsersController;
+use Illuminate\Support\Facades\Route;
 
 Route::group(['prefix' => 'inventory', 'as' => 'inventory.'], function () {
 
@@ -28,6 +28,6 @@ Route::group(['prefix' => 'inventory', 'as' => 'inventory.'], function () {
     Route::resource('kategorisub', KategorisubController::class)->names('kategorisub');
 
     // Menu Management
-    // Route::resource('menu', MenuController::class)->names('menu');
+    Route::resource('barang', BarangController::class)->names('barang');
 
 });
