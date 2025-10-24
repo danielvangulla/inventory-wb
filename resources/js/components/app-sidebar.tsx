@@ -4,7 +4,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { LayoutGrid, Store, ArrowBigRightDash, Settings, Settings2, Users, Monitor, ChartAreaIcon } from 'lucide-react';
+import { LayoutGrid, Store, ArrowBigRightDash, Settings2, Users, Monitor, ChartAreaIcon, BoxIcon } from 'lucide-react';
 import AppLogo from './app-logo';
 
 export function AppSidebar() {
@@ -32,9 +32,17 @@ export function AppSidebar() {
     ];
 
     if (level.is_admin) {
+        mainNavItems.push({
+            title: 'Pengaturan Sistem',
+            href: '/inventory/setup',
+            icon: Settings2,
+        });
+    }
+
+    if (level.is_admin) {
         mainNavItems.push(
         {
-            title: 'Auth Manager',
+            title: 'Pengaturan User',
             href: '#',
             icon: Users,
             subItems: [
@@ -52,51 +60,44 @@ export function AppSidebar() {
         });
     }
 
-    if (level.basic_read || level.basic_write || level.is_admin) {
-        mainNavItems.push({
-            title: 'Basic Setup',
-            href: '/foodcourt/setup',
-            icon: Settings2,
-        });
-    }
-
-    if (level.tenant_read || level.tenant_write || level.is_admin) {
-        mainNavItems.push({
-            title: 'Daftar Tenants',
-            href: '/foodcourt/tenants',
-            icon: Store,
-        });
-    }
-
-    if (level.menu_read || level.menu_write || level.is_admin) {
-        mainNavItems.push({
-            title: 'Menu',
+    if (level.is_admin || level.spv || level.menu_read) {
+        mainNavItems.push(
+        {
+            title: 'Pengaturan Barang',
             href: '#',
-            icon: Settings,
+            icon: BoxIcon,
             subItems: [
                 {
                     title: 'Kategori',
-                    href: '/foodcourt/kategori',
+                    href: '/inventory/kategori',
                     icon: ArrowBigRightDash,
                 },
                 {
                     title: 'Sub-kategori',
-                    href: '/foodcourt/kategorisub',
+                    href: '/inventory/kategorisub',
                     icon: ArrowBigRightDash,
                 },
                 {
                     title: 'Daftar Menu',
-                    href: '/foodcourt/menu',
+                    href: '/inventory/menu',
                     icon: ArrowBigRightDash,
                 },
             ],
         });
     }
 
+    if (level.tenant_read || level.tenant_write || level.is_admin) {
+        mainNavItems.push({
+            title: 'Daftar Tenants',
+            href: '/inventory/tenants',
+            icon: Store,
+        });
+    }
+
     if (level.is_admin || level.kasir || level.spv) {
         mainNavItems.push({
             title: 'Transaksi Kasir',
-            href: '/foodcourt/kasir',
+            href: '/inventory/kasir',
             icon: LayoutGrid,
         });
     }
@@ -104,7 +105,7 @@ export function AppSidebar() {
     if (level.is_admin || level.kasir || level.spv) {
         mainNavItems.push({
             title: 'History Transaksi',
-            href: '/foodcourt/history',
+            href: '/inventory/history',
             icon: LayoutGrid,
         });
     }
@@ -115,7 +116,7 @@ export function AppSidebar() {
         subItemsLaporan.push(
                 {
                     title: 'Omset Tenant',
-                    href: '/foodcourt/rekap-omset-tenant',
+                    href: '/inventory/rekap-omset-tenant',
                     icon: ArrowBigRightDash,
                 },
         );
@@ -125,12 +126,12 @@ export function AppSidebar() {
         subItemsLaporan.push(
             {
                 title: 'Omset Harian',
-                href: '/foodcourt/rekap-omset-harian',
+                href: '/inventory/rekap-omset-harian',
                 icon: ArrowBigRightDash,
             },
             {
                 title: 'Penjualan by Item',
-                href: '/foodcourt/penjualan-by-item',
+                href: '/inventory/penjualan-by-item',
                 icon: ArrowBigRightDash,
             }
         );

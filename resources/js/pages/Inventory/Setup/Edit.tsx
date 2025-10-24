@@ -1,21 +1,21 @@
 import AppLayout from "@/layouts/app-layout";
 import { Head, router } from "@inertiajs/react";
 import React, { useState } from "react";
-import { setup } from "../models";
+import { Setup } from "../models";
 
 interface Props {
-    setup: setup;
+    setup: Setup;
 }
 
 const Edit: React.FC<Props> = ({ setup }) => {
     const breadcrumbs = [
         {
             title: "Edit Tenant",
-            href: "/foodcourt/tenants"
+            href: "/inventory/tenants"
         },
     ];
 
-    const [formData, setFormData] = useState<setup>(
+    const [formData, setFormData] = useState<Setup>(
         setup || {
             id: 0,
             key: '',
@@ -35,7 +35,7 @@ const Edit: React.FC<Props> = ({ setup }) => {
         setSuccess(false);
 
         try {
-            router.patch(route("foodcourt.setup.update", setup.id), { ...formData }, {
+            router.patch(route("inventory.setup.update", setup.id), { ...formData }, {
                 onSuccess: () => {
                     setSuccess(true);
                     setFormData(formData);

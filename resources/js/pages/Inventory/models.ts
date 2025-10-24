@@ -1,4 +1,3 @@
-
 export interface Setup {
     id: number;
     key: string;
@@ -27,4 +26,33 @@ export interface Level {
     kasir: boolean;
     spv: boolean;
     laporan: boolean;
+}
+
+export interface Kategori {
+    id: number;
+    ket: string;
+    urut: number;
+}
+
+export interface Kategorisub {
+    id: number;
+    kategori_id: number;
+    ket: string;
+    urut: number;
+    kategori?: Kategori;
+}
+
+export interface menu {
+    id: number;
+    sku: string;
+    tenant_id: number;
+    kategorisub_id: number;
+    alias: string;
+    deskripsi: string;
+    harga: number;
+    is_ready: boolean;
+    is_soldout: boolean;
+    kategorisub?: Kategorisub;
+    qty?: number;
+    total?: number;
 }

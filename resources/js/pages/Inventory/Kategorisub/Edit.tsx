@@ -1,25 +1,29 @@
 import AppLayout from "@/layouts/app-layout";
 import { Head, router } from "@inertiajs/react";
 import React, { useState } from "react";
-import { Setup } from "../models";
+import { Kategori, Kategorisub } from "../models";
 
-const initialFormData: Setup = {
-    id: 0,
-    key: "",
-    value: "",
-    readonly_key: false,
-    readonly_value: false
-};
+interface Props {
+    kategori: Kategori[];
+    kategorisub: Kategorisub;
+}
 
-const Create: React.FC = () => {
+const Edit: React.FC<Props> = ({ kategori, kategorisub }) => {
     const breadcrumbs = [
         {
-            title: "Tambah Setup",
-            href: "/inventory/setup"
+            title: "Edit Sub-Kategori",
+            href: "/inventory/kategorisub"
         },
     ];
 
-    const [formData, setFormData] = useState<Setup>(initialFormData);
+    const [formData, setFormData] = useState<Kategorisub>(
+        kategorisub || {
+            id: 0,
+            id_kategori: 0,
+            ket: "",
+            urut: 9,
+        }
+    );
 
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -31,10 +35,16 @@ const Create: React.FC = () => {
         setSuccess(false);
 
         try {
-            router.post(route("inventory.setup.store"), { ...formData }, {
+            const payload = {
+                kategori_id: formData.kategori_id,
+                ket: formData.ket,
+                urut: formData.urut
+             };
+
+            router.patch(route("inventory.kategorisub.update", kategorisub.id), payload, {
                 onSuccess: () => {
                     setSuccess(true);
-                    setFormData(initialFormData);
+                    setFormData(formData);
                 },
                 onError: (errors) => {
                     if (errors && typeof errors === "object") {
@@ -67,33 +77,47 @@ const Create: React.FC = () => {
 
             <div className="container mx-auto max-w-xl p-2">
                 <div className="mb-6 flex flex-row items-center pt-2">
-                    <h1 className="text-xl font-bold">Tambah Tenant</h1>
+                    <h1 className="text-xl font-bold">Edit Kategori</h1>
                 </div>
 
                 <div className="space-y-4 bg-gray-200 p-4 rounded shadow">
 
                     <div className="flex flex-wrap justify-center gap-4 py-4 bg-gray-100 dark:bg-gray-700 rounded-lg border-2 border-black dark:border-gray-600">
+                        {/* Select Kategori */}
+                        <div className="flex flex-col w-full">
+                            <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 pl-1">Kategori</label>
+                            <select
+                                value={formData.kategori_id}
+                                onChange={(e) => setFormData({ ...formData, kategori_id: +e.target.value })}
+                                className="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-white p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            >
+                                <option value={0}>-- Select Kategori --</option>
+                                {kategori.map((kat) => (
+                                    <option key={kat.id} value={kat.id}>
+                                        {kat.ket}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
 
-                        {/* Key */}
+                        {/* Keterangan */}
                         <div className="flex flex-col">
-                            <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 pl-1">Key</label>
+                            <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 pl-1">Sub-Kategori</label>
                             <input
                                 type="text"
-                                value={formData.key}
-                                onChange={(e => setFormData({ ...formData, key: e.target.value }))}
-                                placeholder="System Key"
+                                value={formData.ket}
+                                onChange={(e => setFormData({ ...formData, ket: e.target.value }))}
                                 className="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-white p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                             />
                         </div>
 
-                        {/* Value */}
+                        {/* Urutan */}
                         <div className="flex flex-col">
-                            <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 pl-1">Value</label>
+                            <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 pl-1">Urutan</label>
                             <input
-                                type="text"
-                                value={formData.value}
-                                onChange={(e => setFormData({ ...formData, value: e.target.value }))}
-                                placeholder="1:Aktif, 0:Tidak Aktif"
+                                type="number"
+                                value={formData.urut}
+                                onChange={(e => setFormData({ ...formData, urut: +e.target.value }))}
                                 className="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-white p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                             />
                         </div>
@@ -101,7 +125,7 @@ const Create: React.FC = () => {
                     </div>
 
                     {error && <div className="text-red-600">{error}</div>}
-                    {success && <div className="text-green-600">Setup berhasil dibuat!</div>}
+                    {success && <div className="text-green-600">Sub-Kategori berhasil diperbarui!</div>}
 
                     <div className="flex justify-center gap-4 mt-4">
                         <button
@@ -128,4 +152,4 @@ const Create: React.FC = () => {
     );
 };
 
-export default Create;
+export default Edit;

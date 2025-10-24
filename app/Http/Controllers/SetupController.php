@@ -8,8 +8,8 @@ use Illuminate\Support\Facades\Auth;
 
 class SetupController extends Controller
 {
-    protected $view = 'Foodcourt/Setup';
-    protected $route = 'foodcourt.setup';
+    protected $view = 'Inventory/Setup';
+    protected $route = 'inventory.setup';
 
     public function __construct() {
         $user = Auth::user();

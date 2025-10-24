@@ -2,26 +2,35 @@ import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
 import { Edit, Search, Trash2 } from 'lucide-react';
-import { Setup } from '../models';
+import { useState } from 'react';
+import { Kategori } from '../models';
 
 interface Props {
-    setup: Setup[];
+    kategori: Kategori[];
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'BASIC SETUP',
-        href: '/inventory/setup',
+        title: 'KATEGORI',
+        href: '/inventory/kategori',
     },
 ];
 
-const Index: React.FC<Props> = ({ setup }) => {
-    const handleDelete = (id: number) => {
-        const setupItem = setup.find(s => s.id === id);
-        const key = setupItem?.key || 'setup ini';
+const Index: React.FC<Props> = ({ kategori }) => {
+    const [filteredKategori, setFilteredKategori] = useState<Kategori[]>(kategori);
 
-        if (confirm(`Hapus ${key} ?`)) {
-            router.delete(route('inventory.setup.destroy', id));
+    const handleSearch = (query: string) => {
+        const filtered = kategori.filter(item =>
+            item.ket.toLowerCase().includes(query.toLowerCase())
+        );
+        setFilteredKategori(filtered);
+    };
+
+    const handleDelete = (id: number) => {
+        const ket = kategori.find(t => t.id === id)?.ket || 'this kategori';
+
+        if (confirm(`Hapus Kategori ${ket} ?`)) {
+            router.delete(route('inventory.kategori.destroy', id));
         }
     }
 
@@ -34,10 +43,10 @@ const Index: React.FC<Props> = ({ setup }) => {
 
                     <div className="mb-2">
                         <Link
-                            href={route('inventory.setup.create')}
+                            href={route('inventory.kategori.create')}
                             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
                         >
-                            Add Setup
+                            Add Kategori
                         </Link>
                     </div>
 
@@ -47,9 +56,8 @@ const Index: React.FC<Props> = ({ setup }) => {
                         </div>
                         <input
                             type="text"
-                            value={''}
-                            onChange={() => { }}
-                            placeholder="Search..."
+                            onChange={(e) => handleSearch(e.target.value)}
+                            placeholder="Cari kategori..."
                             className="w-full pl-10 pr-4 py-2 rounded-md border-2 border-gray-500 dark:border-gray-300 dark:bg-gray-800 text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
                     </div>
@@ -60,28 +68,36 @@ const Index: React.FC<Props> = ({ setup }) => {
                         <thead>
                             <tr className="bg-gray-200 dark:bg-gray-700 border border-gray-300 dark:border-gray-600">
                                 <th className="py-2 px-2 text-center border border-black dark:border-gray-400">No</th>
-                                <th className="py-2 px-2 border border-black dark:border-gray-400">Key</th>
-                                <th className="py-2 px-2 border border-black dark:border-gray-400">Value</th>
+                                <th className="py-2 px-2 text-center border border-black dark:border-gray-400">Kategori</th>
+                                <th className="py-2 px-2 text-center border border-black dark:border-gray-400">Urutan</th>
                                 <th className="py-2 px-2 text-center border border-black dark:border-gray-400"></th>
                             </tr>
                         </thead>
                         <tbody>
-                            {setup.map((v, index) => (
+                            {filteredKategori.length === 0 && (
+                                <tr>
+                                    <td colSpan={4} className="py-2 px-2 text-center border border-black dark:border-gray-400">
+                                        Tidak ada data...
+                                    </td>
+                                </tr>
+                            )}
+
+                            {filteredKategori.length > 0 && filteredKategori.map((v, index) => (
                                 <tr key={v.id} className='hover:bg-blue-300 dark:hover:bg-gray-600'>
                                     <td className="py-2 px-2 text-center border border-black dark:border-gray-400">{index + 1}</td>
-                                    <td className="py-2 px-2 border border-black dark:border-gray-400">{v.key}</td>
-                                    <td className="py-2 px-2 text-center border border-black dark:border-gray-400">{v.value ? 'Aktif' : 'Tidak Aktif'}</td>
+                                    <td className="py-2 px-2 text-left border border-black dark:border-gray-400">{v.ket}</td>
+                                    <td className="py-2 px-2 text-center border border-black dark:border-gray-400">{v.urut}</td>
                                     <td className="py-2 px-1 text-center border border-black dark:border-gray-400">
                                         <div className='flex flex-row justify-center gap-1'>
                                         <Link
-                                            title={`Edit ${v.key}`}
-                                            href={route('inventory.setup.edit', v.id)}
+                                            title={`Edit ${v.ket}`}
+                                            href={route('inventory.kategori.edit', v.id)}
                                             className="text-blue-500 hover:text-blue-700 cursor-pointer">
                                             <Edit size={16} />
                                         </Link>
 
                                         <button
-                                            title={`Hapus ${v.key}`}
+                                            title={`Hapus ${v.ket}`}
                                             onClick={() => handleDelete(v.id)}
                                             className="text-red-500 hover:text-red-700 cursor-pointer">
                                             <Trash2 size={16} />
