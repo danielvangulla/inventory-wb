@@ -1,9 +1,7 @@
 <?php
 
-namespace App\Http\Controllers\Foodcourt;
+namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
-use App\Models\Tenant;
 use App\Models\User;
 use App\Models\UserLevel;
 use Illuminate\Http\Request;
@@ -11,8 +9,8 @@ use Illuminate\Support\Facades\Auth;
 
 class UsersController extends Controller
 {
-    protected $view = 'Foodcourt/Users';
-    protected $route = 'foodcourt.users';
+    protected $view = 'Inventory/Users';
+    protected $route = 'inventory.users';
 
     public function __construct() {
         $user = Auth::user();
@@ -25,9 +23,8 @@ class UsersController extends Controller
 
     public function index()
     {
-        $users = User::select('id', 'name', 'user_level_id', 'tenant_id')
+        $users = User::select('id', 'name', 'user_level_id')
             ->with('level:id,name')
-            ->with('tenant:id,nama_tenant')
             ->orderBy('user_level_id')
             ->orderBy('name')
             ->get();
@@ -40,11 +37,9 @@ class UsersController extends Controller
     public function create()
     {
         $levels = UserLevel::all();
-        $tenants = Tenant::all();
 
         return inertia("$this->view/Create", [
             'levels' => $levels,
-            'tenants' => $tenants
         ]);
     }
 
@@ -54,11 +49,10 @@ class UsersController extends Controller
             'name' => 'required|string|max:255',
             'password' => 'required|string|min:8|confirmed',
             'user_level_id' => 'required|exists:user_levels,id',
-            'tenant_id' => 'nullable|exists:tenants,id',
         ]);
 
         $validated['password'] = bcrypt($validated['password']);
-        $validated['email'] = $r->input('email', $r->input('name') . '@paragonfc.com');
+        $validated['email'] = $r->input('email', $r->input('name') . '@mail.com');
 
         User::create($validated);
 
@@ -74,12 +68,10 @@ class UsersController extends Controller
     {
         $user = User::findOrFail($id);
         $levels = UserLevel::all();
-        $tenants = Tenant::all();
 
         return inertia("$this->view/Edit", [
             'user' => $user,
             'levels' => $levels,
-            'tenants' => $tenants
         ]);
     }
 
@@ -91,7 +83,6 @@ class UsersController extends Controller
             'name' => 'required|string|max:255',
             'password' => 'nullable|string|min:8|confirmed',
             'user_level_id' => 'required|exists:user_levels,id',
-            'tenant_id' => 'required|exists:tenants,id',
         ]);
 
         if ($r->filled('password')) {

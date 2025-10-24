@@ -40,12 +40,12 @@ export function AppSidebar() {
             subItems: [
                 {
                     title: 'Levels',
-                    href: '/foodcourt/user-level',
+                    href: '/inventory/user-level',
                     icon: ArrowBigRightDash,
                 },
                 {
                     title: 'Users',
-                    href: '/foodcourt/users',
+                    href: '/inventory/users',
                     icon: ArrowBigRightDash,
                 },
             ],

@@ -4,26 +4,26 @@ import AppLayout from "@/layouts/app-layout";
 import { BreadcrumbItem } from "@/types";
 import { Head } from "@inertiajs/react";
 
-const features = [
-    {
-        title: "Menu Variatif",
-        desc: "Nikmati beragam pilihan makanan lezat dari berbagai tenant favorit.",
-        color: "bg-pink-200",
-        icon: "🍔",
-    },
-    {
-        title: "Promo Menarik",
-        desc: "Dapatkan diskon dan promo spesial setiap hari hanya di FoodCourt.",
-        color: "bg-yellow-200",
-        icon: "🎁",
-    },
-    {
-        title: "Pesan Mudah",
-        desc: "Pesan makanan favoritmu dengan cepat dan praktis lewat aplikasi.",
-        color: "bg-green-200",
-        icon: "📱",
-    },
-];
+// const features = [
+//     {
+//         title: "Menu Variatif",
+//         desc: "Nikmati beragam pilihan makanan lezat dari berbagai tenant favorit.",
+//         color: "bg-pink-200",
+//         icon: "🍔",
+//     },
+//     {
+//         title: "Promo Menarik",
+//         desc: "Dapatkan diskon dan promo spesial setiap hari hanya di FoodCourt.",
+//         color: "bg-yellow-200",
+//         icon: "🎁",
+//     },
+//     {
+//         title: "Pesan Mudah",
+//         desc: "Pesan makanan favoritmu dengan cepat dan praktis lewat aplikasi.",
+//         color: "bg-green-200",
+//         icon: "📱",
+//     },
+// ];
 
 interface Props {
     tenants: any[];
@@ -56,13 +56,13 @@ const Index: React.FC<Props> = ({ tenants }) => {
                 </div>
 
                 <div className="w-full grid gap-6 md:grid-cols-2 lg:grid-cols-3 z-10">
-                    {[].map((feature, index) => (
+                    {/* {[].map((feature, index) => (
                         <div key={index} className={`p-6 border border-red-500 rounded-lg shadow-md ${feature.color} hover:shadow-lg transition-shadow duration-300`}>
                             <div className="text-4xl mb-4">{feature.icon}</div>
                             <h2 className="text-xl font-semibold mb-2">{feature.title}</h2>
                             <p className="text-gray-700">{feature.desc}</p>
                         </div>
-                    ))}
+                    ))} */}
                 </div>
 
                 {/* list tenants, with horizontal scrolling, with background image in every tenant card */}

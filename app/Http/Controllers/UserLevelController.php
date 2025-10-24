@@ -1,8 +1,7 @@
 <?php
 
-namespace App\Http\Controllers\Foodcourt;
+namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\UserLevel;
 use Illuminate\Http\Request;
@@ -10,8 +9,8 @@ use Illuminate\Support\Facades\Auth;
 
 class UserLevelController extends Controller
 {
-    protected $view = 'Foodcourt/UserLevel';
-    protected $route = 'foodcourt.user-level';
+    protected $view = 'Inventory/UserLevel';
+    protected $route = 'inventory.user-level';
 
     public function __construct() {
         $user = Auth::user();
