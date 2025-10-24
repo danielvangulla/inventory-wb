@@ -31,7 +31,7 @@ class AppServiceProvider extends ServiceProvider
                 }),
 
                 // Burst kecil per 10 detik untuk meredam spike
-                Limit::perMinute(60)->by($request->ip() . ':burst'),
+                Limit::perMinute(120)->by($request->ip() . ':burst'),
             ];
         });
 

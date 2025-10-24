@@ -10,6 +10,8 @@ class BlacklistIp
 {
     public function handle(Request $request, Closure $next)
     {
+        return $next($request);
+
         $ip = $request->ip();
 
         if ($ip == '127.0.0.1') {

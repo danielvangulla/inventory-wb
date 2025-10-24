@@ -14,10 +14,10 @@ export default function AuthSimpleLayout({ children, title, description }: Props
             <div className="w-full max-w-sm rounded-lg border bg-card shadow-md dark:border-slate-700 dark:bg-slate-800 p-4">
                 <div className="flex flex-col gap-2">
                     <div className="flex flex-col items-center gap-1">
-                        <Link href={route('foodcourt.kasir.index')} className="flex flex-col items-center gap-2 font-medium">
+                        <Link href={route('inventory.landing')} className="flex flex-col items-center gap-2 font-medium">
                             <div className="mb-1 flex h-60 w-60 items-center justify-center rounded-md">
                                 {/* <AppLogoIcon className="size-9 fill-current text-[var(--foreground)] dark:text-white" /> */}
-                                <img className="fill-current text-white dark:text-black rounded-xl" src='/images/logo-hd.png' />
+                                <img className="fill-current text-white dark:text-black rounded-xl" src='/images/inventory/logo.png' />
                             </div>
                             <span className="sr-only">{title}</span>
                         </Link>

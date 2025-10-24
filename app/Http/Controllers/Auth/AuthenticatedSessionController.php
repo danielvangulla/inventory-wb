@@ -39,7 +39,7 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('foodcourt.landing', absolute: false));
+        return redirect()->intended(route('inventory.landing', absolute: false));
     }
 
     /**

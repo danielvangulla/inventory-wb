@@ -19,11 +19,9 @@ return new class extends Migration
             $table->boolean('is_admin')->default(false);
             $table->boolean('basic_read')->default(true);
             $table->boolean('basic_write')->default(false);
-            $table->boolean('tenant_read')->default(true);
-            $table->boolean('tenant_write')->default(false);
             $table->boolean('menu_read')->default(true);
             $table->boolean('menu_write')->default(false);
-            $table->boolean('kasir')->default(true);
+            $table->boolean('kasir')->default(false);
             $table->boolean('spv')->default(false);
             $table->boolean('laporan')->default(false);
 

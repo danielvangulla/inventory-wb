@@ -2,11 +2,15 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
 
 class UserLevel extends Model
 {
+    use HasFactory, SoftDeletes;
+
     protected $fillable = [
         'name',
         'ket',
@@ -53,8 +57,6 @@ class UserLevel extends Model
             'is_admin',
             'basic_read',
             'basic_write',
-            'tenant_read',
-            'tenant_write',
             'menu_read',
             'menu_write',
             'kasir',

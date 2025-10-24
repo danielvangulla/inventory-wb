@@ -26,7 +26,7 @@ export function AppSidebar() {
     const mainNavItems: NavItem[] = [
         {
             title: 'Dashboard',
-            href: '/foodcourt',
+            href: '/inventory',
             icon: Monitor,
         },
     ];
