@@ -57,3 +57,11 @@ export interface Barang {
     kategori?: Kategori;
     kategorisub?: Kategorisub;
 }
+
+export interface Supplier {
+    id: number;
+    nama: string;
+    alamat: string;
+}
+
+export type Outlet = Supplier;

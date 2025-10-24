@@ -63,6 +63,27 @@ export function AppSidebar() {
     if (level.is_admin || level.spv || level.menu_read) {
         mainNavItems.push(
         {
+            title: 'Pengaturan Dasar',
+            href: '#',
+            icon: Settings2,
+            subItems: [
+                {
+                    title: 'Suppliers',
+                    href: '/inventory/suppliers',
+                    icon: ArrowBigRightDash,
+                },
+                {
+                    title: 'Outlets',
+                    href: '/inventory/outlets',
+                    icon: ArrowBigRightDash,
+                },
+            ],
+        });
+    }
+
+    if (level.is_admin || level.spv || level.menu_read) {
+        mainNavItems.push(
+        {
             title: 'Pengaturan Barang',
             href: '#',
             icon: BoxIcon,

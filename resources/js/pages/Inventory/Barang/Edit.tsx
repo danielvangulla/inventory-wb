@@ -189,7 +189,7 @@ const Edit: React.FC<Props> = ({ barang, kategori }) => {
                     </div>
 
                     {error && <div className="text-red-600">{error}</div>}
-                    {success && <div className="text-green-600">Sub-Kategori berhasil diperbarui!</div>}
+                    {success && <div className="text-green-600">Barang berhasil diperbarui!</div>}
 
                     <div className="flex justify-center gap-4 mt-4">
                         <button

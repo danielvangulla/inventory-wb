@@ -199,7 +199,7 @@ const Create: React.FC<Props> = ({ kategori }) => {
                     </div>
 
                     {error && <div className="text-red-600">{error}</div>}
-                    {success && <div className="text-green-600">Sub-Kategori berhasil dibuat!</div>}
+                    {success && <div className="text-green-600">Barang berhasil dibuat!</div>}
 
                     <div className="flex justify-center gap-4 mt-4">
                         <button
