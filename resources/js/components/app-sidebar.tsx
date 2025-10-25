@@ -107,27 +107,34 @@ export function AppSidebar() {
         });
     }
 
-    if (level.tenant_read || level.tenant_write || level.is_admin) {
-        mainNavItems.push({
-            title: 'Daftar Tenants',
-            href: '/inventory/tenants',
-            icon: Store,
-        });
-    }
-
-    if (level.is_admin || level.kasir || level.spv) {
-        mainNavItems.push({
-            title: 'Transaksi Kasir',
-            href: '/inventory/kasir',
-            icon: LayoutGrid,
-        });
-    }
-
-    if (level.is_admin || level.kasir || level.spv) {
-        mainNavItems.push({
-            title: 'History Transaksi',
-            href: '/inventory/history',
-            icon: LayoutGrid,
+    if (level.is_admin || level.spv || level.kasir) {
+        mainNavItems.push(
+        {
+            title: 'Transaksi',
+            href: '#',
+            icon: BoxIcon,
+            subItems: [
+                {
+                    title: 'Terima Gudang',
+                    href: '/inventory/terima-gudang',
+                    icon: ArrowBigRightDash,
+                },
+                {
+                    title: 'Keluar Gudang',
+                    href: '/inventory/keluar-gudang',
+                    icon: ArrowBigRightDash,
+                },
+                {
+                    title: 'Barang Rusak',
+                    href: '/inventory/barang-rusak',
+                    icon: ArrowBigRightDash,
+                },
+                {
+                    title: 'Stok Opname',
+                    href: '/inventory/stok-opname',
+                    icon: ArrowBigRightDash,
+                },
+            ],
         });
     }
 

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Inventory\BarangController;
+use App\Http\Controllers\Inventory\GudangMasukController;
 use App\Http\Controllers\Inventory\KategoriController;
 use App\Http\Controllers\Inventory\KategorisubController;
 use App\Http\Controllers\Inventory\LandingController;
@@ -37,4 +38,10 @@ Route::group(['prefix' => 'inventory', 'as' => 'inventory.'], function () {
 
     // Outlet Management
     Route::resource('outlets', OutletController::class)->names('outlets');
+
+    // Transaction
+    Route::resource('terima-gudang', GudangMasukController::class)->names('terima-gudang')->only(['index', 'create', 'store']);
+    // Route::resource('keluar-gudang', KeluarGudangController::class)->names('keluar-gudang');
+    // Route::resource('barang-rusak', BarangRusakController::class)->names('barang-rusak');
+    // Route::resource('stok-opname', StokOpnameController::class)->names('stok-opname');
 });

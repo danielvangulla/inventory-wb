@@ -65,3 +65,59 @@ export interface Supplier {
 }
 
 export type Outlet = Supplier;
+
+export interface GudangMasuk {
+    id: number;
+    tgl: string;
+    supplier_id: number;
+    penerima: string;
+    brutto: number;
+    disc: number;
+    netto: number;
+    tax: number;
+    total: number;
+    jenis_bayar: string;
+    due: string;
+    is_lunas: boolean;
+    tgl_lunas?: string;
+    supplier?: Supplier;
+    details?: GudangMasukDetail[];
+}
+
+export interface GudangMasukDetail {
+    id: number;
+    gudang_masuk_id: number;
+    barang_id: number;
+    harga: number;
+    qty: number;
+    brutto: number;
+    disc: number;
+    netto: number;
+    tax: number;
+    total: number;
+    barang?: Barang;
+    gudang_masuk?: GudangMasuk;
+}
+
+export interface GudangKeluar {
+    id: number;
+    tgl: string;
+    outlet_id: number;
+    menyerahkan: string;
+    mengambil: string;
+    mengantar: string;
+    total: number;
+    outlet?: Outlet;
+    details?: GudangKeluarDetail[];
+}
+
+export interface GudangKeluarDetail {
+    id: number;
+    gudang_keluar_id: number;
+    barang_id: number;
+    harga: number;
+    qty: number;
+    total: number;
+    gudang_keluar?: GudangKeluar;
+    barang?: Barang;
+}

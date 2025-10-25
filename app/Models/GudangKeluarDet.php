@@ -24,6 +24,11 @@ class GudangKeluarDet extends Model
         'deleted_at',
     ];
 
+    public function barang()
+    {
+        return $this->belongsTo(Barang::class);
+    }
+
     public function gudangKeluar()
     {
         return $this->belongsTo(GudangKeluar::class);
