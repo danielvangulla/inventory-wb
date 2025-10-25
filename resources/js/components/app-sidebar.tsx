@@ -152,12 +152,12 @@ export function AppSidebar() {
             subItems: [
                 {
                     title: 'Pembelian',
-                    href: '/inventory/laporan-pembelian',
+                    href: `/inventory/laporan-pembelian`,
                     icon: ArrowBigRightDash,
                 },
                 {
                     title: 'Barang Keluar',
-                    href: '/inventory/laporan-barang-keluar',
+                    href: `/inventory/laporan-barang-keluar`,
                     icon: ArrowBigRightDash,
                 },
                 {

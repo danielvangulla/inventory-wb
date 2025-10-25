@@ -5,31 +5,31 @@ import Select from 'react-select';
 import { Head, router } from '@inertiajs/react';
 import { BreadcrumbItem } from '@/types';
 import { PrinterCheck, Search } from 'lucide-react';
-import { Barang, GudangMasukDetail, Kategori, Supplier } from '../models';
-import PembelianTable from './PembelianTable';
+import { Barang, GudangKeluarDetail, Kategori, Outlet } from '../models';
+import BarangKeluarTable from './BarangKeluarTable';
 
 interface Props {
-    data: GudangMasukDetail[];
+    data: GudangKeluarDetail[];
     barangs: Barang[];
-    suppliers: Supplier[];
+    outlets: Outlet[];
     kategoris: Kategori[];
     params: any[];
 }
 
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'LAPORAN PEMBELIAN',
-        href: '/inventory/laporan-pembelian',
-    },
-];
-
-const LaporanPembelian: React.FC<Props> = ({ data, barangs, suppliers, kategoris, params }) => {
+const LaporanBarangKeluar: React.FC<Props> = ({ data, barangs, outlets, kategoris, params }) => {
     const paramTgl1 = params[0] || '';
     const paramTgl2 = params[1] || '';
     const paramBarangId = parseInt(params[2]) || 0;
-    const paramSupplierId = parseInt(params[3]) || 0;
+    const paramOutletId = parseInt(params[3]) || 0;
     const paramKategoriId = parseInt(params[4]) || 0;
     const paramKategorisubId = parseInt(params[5]) || 0;
+
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: 'LAPORAN BARANG KELUAR',
+            href: `/inventory/laporan-barang-keluar`,
+        },
+    ];
 
     //=========================== State untuk filter Tanggal ==========================
     const [tglMulai, setTglMulai] = useState<string>(paramTgl1);
@@ -47,13 +47,13 @@ const LaporanPembelian: React.FC<Props> = ({ data, barangs, suppliers, kategoris
     const handleFilterByTanggal = (tgl1: string, tgl2: string) => {
         if (!tgl1 && !tgl2) return;
 
-        router.visit(`/inventory/laporan-pembelian`, {
+        router.visit(`/inventory/laporan-barang-keluar`, {
             method: 'post',
             data: {
-                tgl1: tgl1,
-                tgl2: tgl2,
+                tgl1,
+                tgl2,
                 barangId: selectedBarangOption?.value || 0,
-                supplierId: selectedSupplierOption?.value || 0,
+                outletId: selectedOutletOption?.value || 0,
                 kategoriId: selectedKategoriOption?.value || 0,
                 kategorisubId: selectedKategorisubOption?.value || 0,
             },
@@ -79,35 +79,35 @@ const LaporanPembelian: React.FC<Props> = ({ data, barangs, suppliers, kategoris
         setSelectedBarangOption(option);
         setFilteredData(finalFilteredData(
             option?.value || 0,
-            selectedSupplierOption?.value || 0,
+            selectedOutletOption?.value || 0,
             selectedKategoriOption?.value || 0,
             selectedKategorisubOption?.value || 0,
             searchQuery
         ));
     };
 
-    const filterByBarang = (currentData: GudangMasukDetail[], barangId: number) => {
+    const filterByBarang = (currentData: GudangKeluarDetail[], barangId: number) => {
         if (barangId === 0) return currentData;
         return currentData.filter(item => item.barang_id === barangId);
     }
 
-    //=========================== State untuk filter Supplier ===========================
-    const supplierOptions = suppliers.map((v: any) => ({
+    //=========================== State untuk filter Outlet ===========================
+    const outletOptions = outlets.map((v: any) => ({
         label: v.nama,
         value: v.id,
         data: v,
     }));
 
-    supplierOptions.unshift({
-        label: 'Semua Supplier',
+    outletOptions.unshift({
+        label: 'Semua Outlet',
         value: 0,
         data: null,
     });
 
-    const [selectedSupplierOption, setSelectedSupplierOption] = useState<any | null>(supplierOptions.find(opt => opt.value === paramSupplierId) || supplierOptions[0]);
+    const [selectedOutletOption, setSelectedOutletOption] = useState<any | null>(outletOptions.find(opt => opt.value === paramOutletId) || outletOptions[0]);
 
-    const handleSupplierOptionChange = (option: any) => {
-        setSelectedSupplierOption(option);
+    const handleOutletOptionChange = (option: any) => {
+        setSelectedOutletOption(option);
         setFilteredData(finalFilteredData(
             selectedBarangOption?.value || 0,
             option?.value || 0,
@@ -117,9 +117,9 @@ const LaporanPembelian: React.FC<Props> = ({ data, barangs, suppliers, kategoris
         ));
     };
 
-    const filterBySupplier = (currentData: GudangMasukDetail[], supplierId: number) => {
-        if (supplierId === 0) return currentData;
-        return currentData.filter(item => item.gudang_masuk?.supplier_id === supplierId);
+    const filterByOutlet = (currentData: GudangKeluarDetail[], outletId: number) => {
+        if (outletId === 0) return currentData;
+        return currentData.filter(item => item.gudang_keluar?.outlet_id === outletId);
     };
 
     //=========================== State untuk filter Kategori ===========================
@@ -143,14 +143,14 @@ const LaporanPembelian: React.FC<Props> = ({ data, barangs, suppliers, kategoris
 
         setFilteredData(finalFilteredData(
             selectedBarangOption?.value || 0,
-            selectedSupplierOption?.value || 0,
+            selectedOutletOption?.value || 0,
             option?.value || 0,
             0,
             searchQuery
         ));
     };
 
-    const filterByKategori = (currentData: GudangMasukDetail[], kategoriId: number) => {
+    const filterByKategori = (currentData: GudangKeluarDetail[], kategoriId: number) => {
         if (kategoriId === 0) return currentData;
         return currentData.filter(item => item.barang?.kategori_id === kategoriId);
     };
@@ -194,36 +194,36 @@ const LaporanPembelian: React.FC<Props> = ({ data, barangs, suppliers, kategoris
         setSelectedKategorisubOption(option);
         setFilteredData(finalFilteredData(
             selectedBarangOption?.value || 0,
-            selectedSupplierOption?.value || 0,
+            selectedOutletOption?.value || 0,
             selectedKategoriOption?.value || 0,
             option?.value || 0,
             searchQuery
         ));
     }
 
-    const filterByKategorisub = (currentData: GudangMasukDetail[], kategorisubId: number) => {
+    const filterByKategorisub = (currentData: GudangKeluarDetail[], kategorisubId: number) => {
         if (kategorisubId === 0) return currentData;
         return currentData.filter(item => item.barang?.kategorisub_id === kategorisubId);
     };
 
     //=========================== State untuk Search ===========================
     const [searchQuery, setSearchQuery] = useState<string>('');
-    const [filteredData, setFilteredData] = useState<GudangMasukDetail[]>(data);
+    const [filteredData, setFilteredData] = useState<GudangKeluarDetail[]>(data);
 
     const handleSearch = (query: string) => {
         setSearchQuery(query);
         setFilteredData(finalFilteredData(
             selectedBarangOption?.value || 0,
-            selectedSupplierOption?.value || 0,
+            selectedOutletOption?.value || 0,
             selectedKategoriOption?.value || 0,
             selectedKategorisubOption?.value || 0,
             query
         ));
     };
 
-    const filterBySearch = (currentData: GudangMasukDetail[], query: string) => {
+    const filterBySearch = (currentData: GudangKeluarDetail[], query: string) => {
         return currentData.filter(item =>
-            item.gudang_masuk?.supplier?.nama.toLowerCase().includes(query.toLowerCase()) ||
+            item.gudang_keluar?.outlet?.nama.toLowerCase().includes(query.toLowerCase()) ||
             item.barang?.deskripsi.toLowerCase().includes(query.toLowerCase()) ||
             item.barang?.kategori?.ket.toLowerCase().includes(query.toLowerCase()) ||
             item.barang?.kategorisub?.ket.toLowerCase().includes(query.toLowerCase())
@@ -233,13 +233,13 @@ const LaporanPembelian: React.FC<Props> = ({ data, barangs, suppliers, kategoris
     // Final filter function combining all filters
     const finalFilteredData = (
         barangId: number,
-        supplierId: number,
+        outletId: number,
         kategoriId: number,
         kategorisubId: number,
         query: string,
     ) => {
         const filter1 = filterByBarang(data, barangId);
-        const filter2 = filterBySupplier(filter1, supplierId);
+        const filter2 = filterByOutlet(filter1, outletId);
         const filter3 = filterByKategori(filter2, kategoriId);
         const filter4 = filterByKategorisub(filter3, kategorisubId);
         const filter5 = filterBySearch(filter4, query);
@@ -248,7 +248,7 @@ const LaporanPembelian: React.FC<Props> = ({ data, barangs, suppliers, kategoris
     }
 
     const handlePrint = () => {
-        const printUrl = `/inventory/laporan-pembelian-print/${tglMulai}/${tglSelesai}/${selectedBarangOption?.value}/${selectedSupplierOption?.value}/${selectedKategoriOption?.value}/${selectedKategorisubOption?.value}`;
+        const printUrl = `/inventory/laporan-barang-keluar-print/${tglMulai}/${tglSelesai}/${selectedBarangOption?.value}/${selectedOutletOption?.value}/${selectedKategoriOption?.value}/${selectedKategorisubOption?.value}`;
 
         const width = window.screen.width * 0.6;
         const height = window.screen.height * 0.8;
@@ -264,7 +264,7 @@ const LaporanPembelian: React.FC<Props> = ({ data, barangs, suppliers, kategoris
             printWindow.onload = () => {
                 setTimeout(() => {
                     printWindow.print();
-                    printWindow.close();
+                    // printWindow.close();
                 }, 200);
             }
         }
@@ -319,9 +319,9 @@ const LaporanPembelian: React.FC<Props> = ({ data, barangs, suppliers, kategoris
 
                             <div className="flex flex-row lg:flex-col items-center lg:items-start justify-center gap-2 lg:gap-0 min-w-36 bg-gray-100 p-1 rounded-lg">
                                 <Select
-                                    options={supplierOptions} // options for autocomplete
-                                    value={selectedSupplierOption} // current selected supplier
-                                    onChange={handleSupplierOptionChange} // onChange handler
+                                    options={outletOptions} // options for autocomplete
+                                    value={selectedOutletOption} // current selected outlet
+                                    onChange={handleOutletOptionChange} // onChange handler
                                     getOptionLabel={(e) => e.label} // specify what to display
                                     getOptionValue={(e) => e.value} // specify value to track
                                     placeholder="Cari..."
@@ -383,11 +383,11 @@ const LaporanPembelian: React.FC<Props> = ({ data, barangs, suppliers, kategoris
                 </div>
 
                 <div className="w-full overflow-x-auto h-full text-sm mt-4">
-                    <PembelianTable filteredData={filteredData} />
+                    <BarangKeluarTable filteredData={filteredData} />
                 </div>
             </div>
         </AppLayout>
     );
 };
 
-export default LaporanPembelian;
+export default LaporanBarangKeluar;

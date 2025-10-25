@@ -51,13 +51,17 @@ Route::group(['prefix' => 'inventory', 'as' => 'inventory.'], function () {
     Route::resource('barang-rusak', BarangRusakController::class)->names('barang-rusak')->only(['index', 'create', 'store', 'destroy']);
     Route::resource('stok-opname', StokOpnameController::class)->names('stok-opname')->only(['index', 'create', 'store', 'destroy']);
 
-    // Reports
+    // Laporan Pembelian
     Route::get('laporan-pembelian', [LaporanController::class, 'laporanPembelian'])->name('laporan-pembelian');
-    Route::get('laporan-pembelian/{tgl1}/{tgl2}/{barangId}/{supplierId}/{kategoriId}/{kategorisubId}',
-        [LaporanController::class, 'laporanPembelian']
-    )->name('laporan-pembelian');
-
+    Route::post('laporan-pembelian', [LaporanController::class, 'laporanPembelianPost'])->name('laporan-pembelian');
     Route::get('laporan-pembelian-print/{tgl1}/{tgl2}/{barangId}/{supplierId}/{kategoriId}/{kategorisubId}',
         [LaporanController::class, 'laporanPembelianPrint']
-    )->name('laporan-pembelian');
+    )->name('laporan-pembelian-print');
+
+    // Laporan Barang Keluar
+    Route::get('laporan-barang-keluar', [LaporanController::class, 'laporanBarangKeluar'])->name('laporan-barang-keluar');
+    Route::post('laporan-barang-keluar', [LaporanController::class, 'laporanBarangKeluarPost'])->name('laporan-barang-keluar');
+    Route::get('laporan-barang-keluar-print/{tgl1}/{tgl2}/{barangId}/{outletId}/{kategoriId}/{kategorisubId}',
+        [LaporanController::class, 'laporanBarangKeluarPrint']
+    )->name('laporan-barang-keluar-print');
 });
