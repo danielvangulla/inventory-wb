@@ -4,15 +4,15 @@ namespace App\Http\Controllers\Inventory;
 
 use App\Http\Controllers\Controller;
 use App\Models\Barang;
-use App\Models\BarangRusak;
-use App\Models\Supplier;
+use App\Models\Opname;
+use App\Models\OpnameDet;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-class BarangRusakController extends Controller
+class StokOpnameController extends Controller
 {
-    protected $view = 'Inventory/BarangRusak';
-    protected $route = 'inventory.barang-rusak';
+    protected $view = 'Inventory/StokOpname';
+    protected $route = 'inventory.stok-opname';
 
     protected $user;
     protected $level;
@@ -39,7 +39,7 @@ class BarangRusakController extends Controller
 
     public function index()
     {
-        $data = BarangRusak::with('supplier', 'details.barang')->get();
+        $data = Opname::with('user', 'details.barang')->get();
 
         return inertia("$this->view/Index", [
             'data' => $data,
@@ -53,12 +53,11 @@ class BarangRusakController extends Controller
             return $this->accessDenied();
         }
 
-        $suppliers = Supplier::all();
         $barangs = Barang::all();
 
         return inertia("$this->view/Create", [
-            'suppliers' => $suppliers,
             'barangs' => $barangs,
+            'canWrite' => $this->checkAuth(),
         ]);
     }
 
@@ -70,34 +69,41 @@ class BarangRusakController extends Controller
 
         $validated = $request->validate([
             'tgl' => 'required|date',
-            'supplier_id' => 'required|exists:suppliers,id',
-            'penerima' => 'required|string',
+            'catatan' => 'nullable|string',
             'total' => 'required|numeric',
-            'details' => 'required|array|min:1',
-            'details.*.barang_id' => 'required|exists:barangs,id',
-            'details.*.qty' => 'required|numeric',
+            'details' => 'required|array',
+            'details.*.barang_id' => 'required|integer|exists:barangs,id',
             'details.*.harga' => 'required|numeric',
-            'details.*.total' => 'required|numeric',
+            'details.*.qty_sistem' => 'required|numeric',
+            'details.*.qty_fisik' => 'required|numeric',
+            'details.*.qty_selisih' => 'required|numeric',
+            'details.*.selisih_rp' => 'required|numeric',
         ]);
 
-        $barangRusak = BarangRusak::create($validated);
+        $validated['user_id'] = $this->user->id;
+        $opname = Opname::create($validated);
 
         foreach ($validated['details'] as $detail) {
-            $barangRusak->details()->create([
-                'barang_rusak_id' => $barangRusak->id,
+            OpnameDet::create([
+                'opname_id' => $opname->id,
                 'barang_id' => $detail['barang_id'],
-                'qty' => $detail['qty'],
                 'harga' => $detail['harga'],
-                'total' => $detail['total'],
+                'qty_sistem' => $detail['qty_sistem'],
+                'qty_fisik' => $detail['qty_fisik'],
+                'qty_selisih' => $detail['qty_selisih'],
+                'selisih_rp' => $detail['selisih_rp'],
             ]);
 
+            // Optionally, update the stock of the barang here if needed
             $barang = Barang::find($detail['barang_id']);
             if ($barang) {
-                $barang->decrement('stok', $detail['qty']);
+                $barang->stok += $detail['qty_selisih'];
+                $barang->save();
             }
+
         }
 
-        return redirect()->route("$this->route.index")->with('success', 'Data barang rusak berhasil disimpan.');
+        return redirect()->route("$this->route.index")->with('success', 'Stok opname berhasil disimpan.');
     }
 
     public function destroy($id)
@@ -106,18 +112,21 @@ class BarangRusakController extends Controller
             return $this->accessDenied();
         }
 
-        $barangRusak = BarangRusak::findOrFail($id);
+        $opname = Opname::findOrFail($id);
 
-        foreach ($barangRusak->details as $detail) {
+        foreach ($opname->details as $detail) {
+            // Optionally, revert the stock of the barang here if needed
             $barang = Barang::find($detail->barang_id);
             if ($barang) {
-                $barang->increment('stok', $detail->qty);
+                $barang->stok -= $detail->qty_selisih;
+                $barang->save();
             }
+
+            $detail->delete();
         }
 
-        $barangRusak->details()->delete();
-        $barangRusak->delete();
+        $opname->delete();
 
-        return redirect()->route("$this->route.index")->with('success', 'Data barang rusak berhasil dihapus.');
+        return redirect()->route("$this->route.index")->with('success', 'Stok opname berhasil dihapus.');
     }
 }

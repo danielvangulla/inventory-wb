@@ -8,6 +8,7 @@ use App\Http\Controllers\Inventory\KategoriController;
 use App\Http\Controllers\Inventory\KategorisubController;
 use App\Http\Controllers\Inventory\LandingController;
 use App\Http\Controllers\Inventory\OutletController;
+use App\Http\Controllers\Inventory\StokOpnameController;
 use App\Http\Controllers\Inventory\SupplierController;
 use App\Http\Controllers\SetupController;
 use App\Http\Controllers\UserLevelController;
@@ -45,5 +46,5 @@ Route::group(['prefix' => 'inventory', 'as' => 'inventory.'], function () {
     Route::resource('terima-gudang', GudangMasukController::class)->names('terima-gudang')->only(['index', 'create', 'store', 'destroy']);
     Route::resource('keluar-gudang', GudangKeluarController::class)->names('keluar-gudang')->only(['index', 'create', 'store', 'destroy']);
     Route::resource('barang-rusak', BarangRusakController::class)->names('barang-rusak');
-    // Route::resource('stok-opname', StokOpnameController::class)->names('stok-opname');
+    Route::resource('stok-opname', StokOpnameController::class)->names('stok-opname');
 });

@@ -16,13 +16,8 @@ return new class extends Migration
 
             $table->date('tgl')->nullable();
             $table->string('catatan', 100)->default('-');
-            $table->integer('barang_id')->default(0);
-            $table->decimal('harga', 14, 2)->default(0);
-            $table->decimal('qty_sistem', 10, 2)->default(0);
-            $table->decimal('qty_fisik', 10, 2)->default(0);
-            $table->decimal('qty_selisih', 10, 2)->default(0);
-            $table->decimal('selisih_rp', 14, 2)->default(0);
             $table->integer('user_id')->default(0);
+            $table->decimal('total', 16, 2)->default(0);
 
             $table->timestamps();
             $table->softDeletes();

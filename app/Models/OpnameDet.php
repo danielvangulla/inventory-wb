@@ -2,20 +2,22 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Opname extends Model
+class OpnameDet extends Model
 {
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'tgl',
-        'catatan',
-        'user_id',
-        'total',
+        'opname_id',
+        'barang_id',
+        'harga',
+        'qty_sistem',
+        'qty_fisik',
+        'qty_selisih',
+        'selisih_rp',
     ];
 
     protected $hidden = [
@@ -24,13 +26,13 @@ class Opname extends Model
         'deleted_at',
     ];
 
-    public function user()
+    public function opname()
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(Opname::class, 'opname_id');
     }
 
-    public function details()
+    public function barang()
     {
-        return $this->hasMany(OpnameDet::class, 'opname_id');
+        return $this->belongsTo(Barang::class, 'barang_id');
     }
 }

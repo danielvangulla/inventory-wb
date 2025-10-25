@@ -143,3 +143,26 @@ export interface BarangRusakDetail {
     barang?: Barang;
     barang_rusak?: BarangRusak;
 }
+
+export interface Opname {
+    id: number;
+    tgl: string;
+    catatan: string;
+    user_id: number;
+    total: number;
+    details?: OpnameDet[];
+    user?: User;
+}
+
+export interface OpnameDet {
+    id: number;
+    opname_id: number;
+    barang_id: number;
+    harga: number;
+    qty_sistem: number;
+    qty_fisik: number;
+    qty_selisih: number;
+    selisih_rp: number;
+    barang?: Barang;
+    opname?: Opname;
+}

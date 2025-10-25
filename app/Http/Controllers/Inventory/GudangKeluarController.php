@@ -39,7 +39,7 @@ class GudangKeluarController extends Controller
 
     public function index()
     {
-        $data = GudangKeluar::with('details', 'details.barang', 'outlet')->get();
+        $data = GudangKeluar::with('details.barang', 'outlet')->get();
 
         return inertia("$this->view/Index", [
             'data' => $data,

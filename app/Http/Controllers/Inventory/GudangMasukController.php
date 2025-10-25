@@ -39,7 +39,7 @@ class GudangMasukController extends Controller
 
     public function index()
     {
-        $data = GudangMasuk::with('details', 'details.barang', 'supplier')->get();
+        $data = GudangMasuk::with('details.barang', 'supplier')->get();
 
         return inertia("$this->view/Index", [
             'data' => $data,
