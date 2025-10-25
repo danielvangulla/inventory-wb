@@ -2,30 +2,32 @@ import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
 import { Search, Trash2 } from 'lucide-react';
-import { GudangMasuk } from '../../models';
+import { GudangKeluar } from '../../models';
 import { useState } from 'react';
 import { formatTgl } from '@/pages/components/functions';
 import { formatDigit } from '@/pages/components/helpers';
 
 interface Props {
-    data: GudangMasuk[];
+    data: GudangKeluar[];
     canWrite: boolean;
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'DAFTAR GUDANG MASUK',
-        href: '/inventory/terima-gudang',
+        title: 'DAFTAR GUDANG KELUAR',
+        href: '/inventory/keluar-gudang',
     },
 ];
 
 const Index: React.FC<Props> = ({ data, canWrite }) => {
-    const [filteredData, setFilteredData] = useState<GudangMasuk[]>(data);
+    const [filteredData, setFilteredData] = useState<GudangKeluar[]>(data);
 
     const handleSearch = (query: string) => {
         const filtered = data.filter(item =>
-            item.penerima.toLowerCase().includes(query.toLowerCase()) ||
-            item.supplier?.nama.toLowerCase().includes(query.toLowerCase()) ||
+            item.menyerahkan.toLowerCase().includes(query.toLowerCase()) ||
+            item.mengambil.toLowerCase().includes(query.toLowerCase()) ||
+            item.mengantar.toLowerCase().includes(query.toLowerCase()) ||
+            item.outlet?.nama.toLowerCase().includes(query.toLowerCase()) ||
             item.details?.some(detail =>
                 detail.barang?.deskripsi.toLowerCase().includes(query.toLowerCase())
             )
@@ -40,12 +42,12 @@ const Index: React.FC<Props> = ({ data, canWrite }) => {
             return;
         }
 
-        const ket = data.find(t => t.id === id)?.penerima || 'Transaksi ini';
+        const ket = data.find(t => t.id === id)?.outlet?.nama || 'Transaksi ini';
 
-        if (confirm(`Hapus Data ${ket} ?`)) {
-            router.delete(route('inventory.terima-gudang.destroy', id));
+        if (confirm(`Hapus Data untuk ${ket} ?`)) {
+            router.delete(route('inventory.keluar-gudang.destroy', id));
 
-            // Optionally, you can also remove the deleted gudang masuk from the local state
+            // Optionally, you can also remove the deleted gudang keluar from the local state
             const updatedData = filteredData.filter(item => item.id !== id);
             setFilteredData(updatedData);
         }
@@ -60,7 +62,7 @@ const Index: React.FC<Props> = ({ data, canWrite }) => {
 
                     {canWrite && <div className="mb-2">
                         <Link
-                            href={route('inventory.terima-gudang.create')}
+                            href={route('inventory.keluar-gudang.create')}
                             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
                         >
                             Buat Baru
@@ -81,17 +83,16 @@ const Index: React.FC<Props> = ({ data, canWrite }) => {
                 </div>
 
                 <div className="w-full overflow-x-auto h-full text-sm">
-                    <table className="bg-white dark:bg-gray-800 shadow-md rounded-md min-w-full">
+                    <table className="bg-white dark:bg-gray-800 shadow-md rounded-md min-w-full text-sm">
                         <thead>
                             <tr className="bg-gray-200 dark:bg-gray-700 border border-gray-300 dark:border-gray-600">
                                 <th className="py-2 px-2 text-center border border-black dark:border-gray-400">#</th>
                                 <th className="py-2 px-2 text-center border border-black dark:border-gray-400">Tanggal</th>
-                                <th className="py-2 px-2 text-center border border-black dark:border-gray-400">Penerima</th>
-                                <th className="py-2 px-2 text-center border border-black dark:border-gray-400">Supplier</th>
+                                <th className="py-2 px-2 text-center border border-black dark:border-gray-400">Outlet</th>
+                                <th className="py-2 px-2 text-center border border-black dark:border-gray-400">Keterangan</th>
                                 <th className="py-2 px-2 text-center border border-black dark:border-gray-400">Detail Barang</th>
                                 <th className="py-2 px-2 text-center border border-black dark:border-gray-400">Total Rp.</th>
-                                <th className="py-2 px-2 text-center border border-black dark:border-gray-400">Jenis Bayar</th>
-                                <th className="py-2 px-2 text-center border border-black dark:border-gray-400">Jatuh Tempo</th>
+                                <th className="py-2 px-2 text-center border border-black dark:border-gray-400">Tanggal Input</th>
                                 <th className="py-2 px-2 text-center border border-black dark:border-gray-400">Act.</th>
                             </tr>
                         </thead>
@@ -108,23 +109,35 @@ const Index: React.FC<Props> = ({ data, canWrite }) => {
                                 <tr key={v.id} className='hover:bg-blue-300 dark:hover:bg-gray-600'>
                                     <td className="py-2 px-2 text-center border border-black dark:border-gray-400">{index + 1}</td>
                                     <td className="py-2 px-2 text-center border border-black dark:border-gray-400">{formatTgl(v.tgl)}</td>
-                                    <td className="py-2 px-2 text-left border border-black dark:border-gray-400">{v.penerima}</td>
-                                    <td className="py-2 px-2 text-left border border-black dark:border-gray-400">{v.supplier?.nama}</td>
-                                    <td className="py-2 px-2 text-left border border-black dark:border-gray-400 font-mono">
+                                    <td className="py-2 px-2 text-left border border-black dark:border-gray-400">{v.outlet?.nama}</td>
+                                    <td className="py-2 px-2 text-left border border-black dark:border-gray-400 whitespace-nowrap text-xs font-mono">
+                                        <div className="flex flex-row">
+                                            <div className='w-20'>Menyerahkan</div>
+                                            <div className="">: {v.menyerahkan}</div>
+                                        </div>
+                                        <div className="flex flex-row">
+                                            <div className='w-20'>Mengambil</div>
+                                            <div className="">: {v.mengambil}</div>
+                                        </div>
+                                        <div className="flex flex-row">
+                                            <div className='w-20'>Mengantar</div>
+                                            <div className="">: {v.mengantar}</div>
+                                        </div>
+                                    </td>
+                                    <td className="py-2 px-2 text-left border border-black dark:border-gray-400 whitespace-nowrap font-mono text-xs">
                                         {v.details && v.details.map((detail, i) => (
-                                            <div key={i} className="flex flex-row justify-between">
+                                            <div key={i} className="flex flex-row justify-between gap-2">
                                                 <span>{detail.barang?.deskripsi}</span>
-                                                <span>{formatDigit(detail.qty, 2)} {detail.barang?.satuan} x {formatDigit(detail.harga, 2)} = {formatDigit(detail.brutto, 2)}</span>
+                                                <span>{formatDigit(detail.qty, 2)} {detail.barang?.satuan} x {formatDigit(detail.harga, 2)} = {formatDigit(detail.total, 2)}</span>
                                             </div>
                                         ))}
                                     </td>
-                                    <td className="py-2 px-2 text-right border border-black dark:border-gray-400 font-mono">{formatDigit(v.total, 2)}</td>
-                                    <td className="py-2 px-2 text-center border border-black dark:border-gray-400">{v.jenis_bayar ? 'Tunai' : 'Kredit'}</td>
-                                    <td className="py-2 px-2 text-center border border-black dark:border-gray-400">{formatTgl(v.due)}</td>
+                                    <td className="py-2 px-2 text-right border border-black dark:border-gray-400">{formatDigit(v.total, 2)}</td>
+                                    <td className="py-2 px-2 text-center border border-black dark:border-gray-400">{formatTgl(v.created_at)}</td>
                                     <td className="py-2 px-1 text-center border border-black dark:border-gray-400">
                                         <div className='flex flex-row justify-center gap-1'>
                                             <button
-                                                title={`Hapus Data ${v.penerima}`}
+                                                title={`Hapus Data untuk ${v.outlet?.nama || 'Transaksi ini'}`}
                                                 onClick={() => handleDelete(v.id)}
                                                 className="text-red-500 hover:text-red-700 cursor-pointer">
                                                 <Trash2 size={16} />

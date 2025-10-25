@@ -104,7 +104,9 @@ const Index: React.FC<Props> = ({ barang }) => {
                                         {v.kategorisub ? `${v.kategorisub.ket}` : ''}
                                     </td>
                                     <td className="py-2 px-2 border border-black dark:border-gray-400">{v.deskripsi}</td>
-                                    <td className="py-2 px-2 text-center border border-black dark:border-gray-400">{v.stok}</td>
+                                    <td className="py-2 px-2 text-center border border-black dark:border-gray-400">
+                                        {formatDigit(v.stok, 2)} {v.satuan}
+                                    </td>
                                     <td className="py-2 px-2 text-right border border-black dark:border-gray-400">{formatDigit(v.harga_beli, 0)}</td>
                                     <td className="py-2 px-2 text-center border border-black dark:border-gray-400">{v.min_stok}</td>
                                     <td className="py-2 px-1 text-center border border-black dark:border-gray-400">

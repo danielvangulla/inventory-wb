@@ -109,6 +109,7 @@ export interface GudangKeluar {
     total: number;
     outlet?: Outlet;
     details?: GudangKeluarDetail[];
+    created_at: string;
 }
 
 export interface GudangKeluarDetail {

@@ -43,6 +43,7 @@ class GudangMasukController extends Controller
 
         return inertia("$this->view/Index", [
             'data' => $data,
+            'canWrite' => $this->checkAuth(),
         ]);
     }
 
@@ -97,6 +98,22 @@ class GudangMasukController extends Controller
         $gudangMasuk = GudangMasuk::create($validatedData);
 
         foreach ($validatedData['details'] as $detail) {
+            $hargaBeli = $detail['harga'];
+            $barang = Barang::find($detail['barang_id']);
+            if ($barang) {
+                // Update harga beli rata-rata
+                $totalStokLama = $barang->stok;
+                $hargaBeliLama = $barang->harga_beli;
+                $stokBaru = $detail['qty'];
+                $totalStokBaru = $totalStokLama + $stokBaru;
+                $hargaBeliBaru = ($hargaBeliLama * $totalStokLama + $hargaBeli * $stokBaru) / $totalStokBaru;
+
+                $barang->update([
+                    'stok' => $totalStokBaru,
+                    'harga_beli' => $hargaBeliBaru,
+                ]);
+            }
+
             $gudangMasuk->details()->create([
                 'gudang_masuk_id' => $gudangMasuk->id,
                 ...$detail,
@@ -113,6 +130,17 @@ class GudangMasukController extends Controller
         }
 
         $gudangMasuk = GudangMasuk::findOrFail($id);
+
+        foreach ($gudangMasuk->details as $detail) {
+            $barang = Barang::find($detail->barang_id);
+            if ($barang) {
+                // Kurangi stok barang
+                $barang->update([
+                    'stok' => max(0, $barang->stok - $detail->qty),
+                ]);
+            }
+        }
+
         $gudangMasuk->details()->delete();
         $gudangMasuk->delete();
 

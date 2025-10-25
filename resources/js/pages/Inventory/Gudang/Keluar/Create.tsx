@@ -3,53 +3,47 @@ import React, { useEffect, useState } from "react";
 import Select from "react-select";
 import AppLayout from "@/layouts/app-layout";
 import { Head, router } from "@inertiajs/react";
-import { Barang, GudangMasuk, GudangMasukDetail, Supplier } from "../../models";
+import { Barang, GudangKeluar, GudangKeluarDetail, Outlet } from "../../models";
 import { formatDigit } from "@/pages/components/helpers";
-import { Trash2 } from "lucide-react";
 
 interface Props {
     barangs: Barang[];
-    suppliers: Supplier[];
+    outlets: Outlet[];
 }
 
-const initialFormData: GudangMasuk = {
+const initialFormData: GudangKeluar = {
     id: 0,
     tgl: new Date().toISOString().split("T")[0],
-    supplier_id: 0,
-    penerima: "",
-    brutto: 0,
-    disc: 0,
-    netto: 0,
-    tax: 0,
+    outlet_id: 0,
+    menyerahkan: "",
+    mengambil: "",
+    mengantar: "",
     total: 0,
-    jenis_bayar: "",
-    due: new Date().toISOString().split("T")[0],
-    is_lunas: false,
-    tgl_lunas: "",
     details: [],
+    created_at: "",
 };
 
-const Create: React.FC<Props> = ({ barangs, suppliers }) => {
+const Create: React.FC<Props> = ({ barangs, outlets }) => {
     const breadcrumbs = [
         {
-            title: "Penerimaan Gudang",
-            href: "/inventory/terima-gudang/create",
+            title: "Pengeluaran Gudang",
+            href: "/inventory/keluar-gudang/create",
         },
     ];
 
-    const [formData, setFormData] = useState<GudangMasuk>(initialFormData);
+    const [formData, setFormData] = useState<GudangKeluar>(initialFormData);
 
-    // Supplier Select State
-    const supplierOptions = suppliers.map((v: any) => ({
+    // Outlet Select State
+    const outletOptions = outlets.map((v: any) => ({
         label: v.nama,
         value: v.id,
     }));
 
-    const [selectedSupplierOption, setSelectedSupplierOption] = useState<any | null>(null);
+    const [selectedOutletOption, setSelectedOutletOption] = useState<any | null>(null);
 
-    const handleOptionChange = (option: any) => {
-        setSelectedSupplierOption(option);
-        setFormData({ ...formData, supplier_id: option.value });
+    const handleOutletOptionChange = (option: any) => {
+        setSelectedOutletOption(option);
+        setFormData({ ...formData, outlet_id: option.value });
     };
 
     // Barang Select State
@@ -63,20 +57,15 @@ const Create: React.FC<Props> = ({ barangs, suppliers }) => {
 
     const handleBarangOptionChange = (option: any) => {
         setSelectedBarangOption(option);
-        // Additional logic to handle selected barang can be added here
+        setItem({ ...item!, harga: option.data.harga_beli || 0 });
     };
 
     // New Item State
-    const [item, setItem] = useState<GudangMasukDetail | null>(null);
+    const [item, setItem] = useState<GudangKeluarDetail | null>(null);
 
     const handleItemQtyChange = (value: string) => {
         const qty = +parseFloat(value).toFixed(2);
         setItem({ ...item!, qty });
-    };
-
-    const handleItemHargaChange = (value: string) => {
-        const harga = +parseFloat(value).toFixed(2);
-        setItem({ ...item!, harga });
     };
 
     // trigger handleAddItem when user hit enter key on harga input
@@ -96,7 +85,7 @@ const Create: React.FC<Props> = ({ barangs, suppliers }) => {
         return () => {
             window.removeEventListener("keydown", handleKeyDown);
         };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [item, selectedBarangOption]);
 
     const handleAddItem = (e: React.FormEvent) => {
@@ -113,37 +102,25 @@ const Create: React.FC<Props> = ({ barangs, suppliers }) => {
             return;
         }
 
-        const harga = item?.harga || 0;
+        const harga = selectedBarangOption ? selectedBarangOption.data.harga_beli || 0 : 0;
         if (isNaN(harga) || harga <= 0) {
-            setError("Harga harus lebih dari 0.");
+            setError("Harga tidak valid.");
             return;
         }
 
-        const brutto = qty * harga;
-        const disc = 0; // default disc 0
-        const netto = brutto;
-        const tax = netto / 100 * 0; // default tax 0%
-        const total = netto + tax - disc;
+        const total = qty * harga;
 
-        const newDetail: GudangMasukDetail = {
+        const newDetail: GudangKeluarDetail = {
             id: 0,
-            gudang_masuk_id: 0,
+            gudang_keluar_id: 0,
             barang_id: selectedBarangOption.value,
             qty,
             harga,
-            brutto,
-            disc,
-            netto,
-            tax,
             total,
         };
 
         setFormData((prev) => ({
             ...prev,
-            brutto: prev.brutto + brutto,
-            disc: prev.disc + disc,
-            netto: prev.netto + netto,
-            tax: prev.tax + tax,
             total: prev.total + total,
             details: [...prev.details!, newDetail],
         }));
@@ -151,21 +128,6 @@ const Create: React.FC<Props> = ({ barangs, suppliers }) => {
         // Reset item and selected barang
         setItem(null);
         setSelectedBarangOption(null);
-    }
-
-    const handleRmoveItem = (index: number) => () => {
-        const detailToRemove = formData.details ? formData.details[index] : null;
-        if (!detailToRemove) return;
-
-        setFormData((prev) => ({
-            ...prev,
-            brutto: prev.brutto - detailToRemove.brutto,
-            disc: prev.disc - detailToRemove.disc,
-            netto: prev.netto - detailToRemove.netto,
-            tax: prev.tax - detailToRemove.tax,
-            total: prev.total - detailToRemove.total,
-            details: prev.details!.filter((_, i) => i !== index),
-        }));
     }
 
     const [submitting, setSubmitting] = useState(false);
@@ -183,23 +145,28 @@ const Create: React.FC<Props> = ({ barangs, suppliers }) => {
             return;
         }
 
-        if (formData.penerima.trim() === "") {
-            setError("Silahkan isi penerima..");
+        if (formData.outlet_id === 0) {
+            setError("Silahkan pilih outlet.");
             return;
         }
 
-        if (formData.supplier_id === 0) {
-            setError("Silahkan pilih supplier..");
+        if (!formData.menyerahkan || formData.menyerahkan.trim() === "") {
+            setError("Silahkan isi nama yang menyerahkan.");
             return;
         }
 
-        if (formData.jenis_bayar.trim() === "") {
-            setError("Silahkan pilih jenis bayar..");
+        if (!formData.mengambil || formData.mengambil.trim() === "") {
+            setError("Silahkan isi nama yang mengambil.");
+            return;
+        }
+
+        if (!formData.mengantar || formData.mengantar.trim() === "") {
+            setError("Silahkan isi nama yang mengantar.");
             return;
         }
 
         if (!formData.details || formData.details.length === 0) {
-            setError("Silahkan tambahkan minimal 1 baris barang.");
+            setError("Silahkan tambahkan minimal 1 item barang.");
             return;
         }
 
@@ -210,30 +177,20 @@ const Create: React.FC<Props> = ({ barangs, suppliers }) => {
         try {
             const payload = {
                 tgl: formData.tgl,
-                supplier_id: formData.supplier_id,
-                penerima: formData.penerima,
-                brutto: formData.brutto,
-                disc: formData.disc,
-                netto: formData.netto,
-                tax: formData.tax,
+                outlet_id: formData.outlet_id,
+                menyerahkan: formData.menyerahkan,
+                mengambil: formData.mengambil,
+                mengantar: formData.mengantar,
                 total: formData.total,
-                jenis_bayar: formData.jenis_bayar,
-                due: formData.due,
-                is_lunas: formData.is_lunas,
-                tgl_lunas: formData.tgl_lunas,
                 details: formData.details?.map((detail) => ({
                     barang_id: detail.barang_id,
                     qty: detail.qty,
                     harga: detail.harga,
-                    brutto: detail.brutto,
-                    disc: detail.disc,
-                    netto: detail.netto,
-                    tax: detail.tax,
                     total: detail.total,
                 })),
             };
 
-            router.post(route("inventory.terima-gudang.store"), payload, {
+            router.post(route("inventory.keluar-gudang.store"), payload, {
                 onSuccess: () => {
                     setSuccess(true);
                     setFormData(initialFormData);
@@ -269,7 +226,7 @@ const Create: React.FC<Props> = ({ barangs, suppliers }) => {
 
             <div className="container mx-auto p-4">
                 <div className="mb-6 flex flex-row items-center pt-2">
-                    <h1 className="pl-2 text-2xl font-bold">Buat Penerimaan Gudang</h1>
+                    <h1 className="pl-2 text-2xl font-bold">Buat Pengeluaran Gudang</h1>
                 </div>
 
                 <div className="space-y-0 bg-slate-200 p-2 rounded shadow">
@@ -277,40 +234,26 @@ const Create: React.FC<Props> = ({ barangs, suppliers }) => {
                     <div className="flex flex-col justify-center gap-1 py-1 bg-blue-200 dark:bg-gray-700 rounded-t-lg border-1 border-black dark:border-gray-600">
 
                         <div className="flex flex-col md:flex-row justify-center gap-2 py-1 px-2">
-                            {/* Tanggal Terima */}
+                            {/* Tanggal */}
                             <div className="flex flex-col md:min-w-48 max-w-full">
-                                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 pl-1">Tanggal Terima</label>
+                                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 pl-1">Tanggal</label>
                                 <input
                                     type="date"
                                     value={formData.tgl}
                                     onChange={(e => setFormData({ ...formData, tgl: e.target.value }))}
-                                    className="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-white p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-white p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 h-10"
                                 />
                             </div>
 
-                            {/* Nama Penerima */}
-                            <div className="flex flex-col md:min-w-48 max-w-full">
-                                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 pl-1">Nama Penerima</label>
-                                <input
-                                    type="text"
-                                    value={formData.penerima}
-                                    onChange={(e => setFormData({ ...formData, penerima: e.target.value }))}
-                                    className="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-white p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
-                            </div>
-
-                        </div>
-
-                        <div className="flex flex-col lg:flex-row justify-center gap-4 py-1 px-2">
-                            {/* Supplier */}
+                            {/* Outlet */}
                             <div className="flex flex-col md:min-w-60 max-w-full">
                                 <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 pl-1">
-                                    Pilih Supplier
+                                    Pilih Outlet
                                 </label>
                                 <Select
-                                    options={supplierOptions} // options for autocomplete
-                                    value={selectedSupplierOption} // current selected supplier
-                                    onChange={handleOptionChange} // onChange handler
+                                    options={outletOptions} // options for autocomplete
+                                    value={selectedOutletOption} // current selected outlet
+                                    onChange={handleOutletOptionChange} // onChange handler
                                     getOptionLabel={(e) => e.label} // specify what to display
                                     getOptionValue={(e) => e.value} // specify value to track
                                     placeholder="Cari..."
@@ -318,28 +261,38 @@ const Create: React.FC<Props> = ({ barangs, suppliers }) => {
                                     classNamePrefix="react-select"
                                 />
                             </div>
+                        </div>
 
-                            {/* Jenis Bayar */}
-                            <div className="flex flex-col md:min-w-60 max-w-full">
-                                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 pl-1">Jenis Bayar</label>
-                                <select
-                                    value={formData.jenis_bayar}
-                                    onChange={(e => setFormData({ ...formData, jenis_bayar: e.target.value }))}
+                        <div className="flex flex-col lg:flex-row justify-center gap-4 py-1 px-2">
+                            {/* Menyerahkan */}
+                            <div className="flex flex-col md:min-w-48 max-w-full">
+                                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 pl-1">Menyerahkan</label>
+                                <input
+                                    type="text"
+                                    value={formData.menyerahkan}
+                                    onChange={(e => setFormData({ ...formData, menyerahkan: e.target.value }))}
                                     className="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-white p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                >
-                                    <option className="italic" value="">=== Pilih Jenis Bayar ===</option>
-                                    <option value="1">Tunai</option>
-                                    <option value="0">Kredit</option>
-                                </select>
+                                />
                             </div>
 
-                            {/* Jatuh Tempo */}
+                            {/* Mengambil */}
                             <div className="flex flex-col md:min-w-48 max-w-full">
-                                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 pl-1">Jatuh Tempo</label>
+                                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 pl-1">Mengambil</label>
                                 <input
-                                    type="date"
-                                    value={formData.due}
-                                    onChange={(e => setFormData({ ...formData, due: e.target.value }))}
+                                    type="text"
+                                    value={formData.mengambil}
+                                    onChange={(e => setFormData({ ...formData, mengambil: e.target.value }))}
+                                    className="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-white p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                />
+                            </div>
+
+                            {/* Mengantar */}
+                            <div className="flex flex-col md:min-w-48 max-w-full">
+                                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 pl-1">Mengantar</label>
+                                <input
+                                    type="text"
+                                    value={formData.mengantar}
+                                    onChange={(e => setFormData({ ...formData, mengantar: e.target.value }))}
                                     className="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-white p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 />
                             </div>
@@ -352,7 +305,7 @@ const Create: React.FC<Props> = ({ barangs, suppliers }) => {
                         <table className="divide-y divide-gray-200 w-full border border-black dark:border-gray-400">
                             <thead className="bg-gray-500 text-white">
                                 <tr>
-                                    <th className="p-2 w-10 text-center text-sm font-bold uppercase tracking-wider border border-black dark:border-gray-400">
+                                    <th className="p-2 text-center text-sm font-bold uppercase tracking-wider border border-black dark:border-gray-400">
                                         #
                                     </th>
                                     <th className="p-2 text-center text-sm font-bold uppercase tracking-wider border border-black dark:border-gray-400">
@@ -367,7 +320,6 @@ const Create: React.FC<Props> = ({ barangs, suppliers }) => {
                                     <th className="p-2 text-center text-sm font-bold uppercase tracking-wider border border-black dark:border-gray-400">
                                         Jumlah
                                     </th>
-                                    <th className="p-2 w-10 text-center text-sm font-bold uppercase tracking-wider border border-black dark:border-gray-400"></th>
                                 </tr>
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-200 text-sm text-black dark:text-white">
@@ -382,21 +334,13 @@ const Create: React.FC<Props> = ({ barangs, suppliers }) => {
                                                     {formatDigit(detail.qty, 2)} {barang ? barang.satuan : ""}
                                                 </td>
                                                 <td className="px-2 py-1 text-right border border-black dark:border-gray-400">{formatDigit(detail.harga, 2)}</td>
-                                                <td className="px-2 py-1 text-right border border-black dark:border-gray-400">{formatDigit(detail.brutto, 2)}</td>
-                                                <td className="px-2 py-1 text-center border border-black dark:border-gray-400">
-                                                    <button
-                                                        onClick={handleRmoveItem(index)}
-                                                        className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-1 rounded cursor-pointer"
-                                                    >
-                                                        <Trash2 size={14} />
-                                                    </button>
-                                                </td>
+                                                <td className="px-2 py-1 text-right border border-black dark:border-gray-400">{formatDigit(detail.total, 2)}</td>
                                             </tr>
                                         );
                                     })
                                 ) : (
                                     <tr>
-                                        <td colSpan={6} className="px-2 py-4 text-center border border-black dark:border-gray-400">
+                                        <td colSpan={5} className="px-2 py-4 text-center border border-black dark:border-gray-400">
                                             Tidak ada item yang ditambahkan.
                                         </td>
                                     </tr>
@@ -405,8 +349,7 @@ const Create: React.FC<Props> = ({ barangs, suppliers }) => {
                             <tfoot className="bg-blue-500 text-md text-white">
                                 <tr>
                                     <td colSpan={4} className="px-2 py-2 text-right font-bold border border-black dark:border-gray-400">T O T A L &nbsp; Rp.</td>
-                                    <td className="px-2 py-2 text-right font-bold border border-black dark:border-gray-400">{formatDigit(formData.total, 0)}</td>
-                                    <td className="px-2 py-2 text-right font-bold border border-black dark:border-gray-400"></td>
+                                    <td className="px-2 py-2 text-right font-bold border border-black dark:border-gray-400">{formatDigit(formData.total, 2)}</td>
                                 </tr>
                             </tfoot>
                         </table>
@@ -430,17 +373,18 @@ const Create: React.FC<Props> = ({ barangs, suppliers }) => {
                                 />
                             </div>
 
-                            <div className="flex flex-row lg:flex-col items-center lg:items-start justify-center gap-2 lg:gap-0 md:min-w-24 max-w-full bg-gray-100 p-1 rounded-lg">
+                            <div className="flex flex-row lg:flex-col items-center lg:items-start justify-center gap-2 lg:gap-0 md:min-w-24 max-w-full bg-gray-300 p-1 rounded-lg">
                                 <label className="text-gray-700 dark:text-gray-300 mb-1 pl-1">
-                                    Harga
-                                    <span className="text-red-500 italic ml-1">{selectedBarangOption?.data.satuan ? `(per ${selectedBarangOption?.data.satuan || ''})` : ''}</span>
+                                    Harga Beli Avg
+                                    <span className="text-red-500 italic ml-1">{selectedBarangOption?.data.satuan ? `(per ${selectedBarangOption?.data.satuan || ''})` : '' }</span>
                                 </label>
                                 <input
                                     type="text"
                                     placeholder="Harga"
-                                    value={formatDigit(item?.harga || 0, 2)}
-                                    onChange={(e) => handleItemHargaChange(e.target.value)}
-                                    className="bg-white border border-gray-300 rounded-lg px-2 h-9 py-1 text-center"
+                                    value={item?.harga || 0}
+                                    onChange={() => {}}
+                                    className="bg-gray-200 border border-gray-300 rounded-lg px-2 h-9 py-1 text-center cursor-not-allowed"
+                                    disabled={true}
                                 />
                             </div>
 
