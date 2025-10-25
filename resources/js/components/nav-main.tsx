@@ -6,6 +6,8 @@ import { Link, usePage } from '@inertiajs/react';
 import { ChevronDown } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
+const appName = import.meta.env.VITE_APP_NAME || '';
+
 export function NavMain({ items = [] }: { items: NavItem[] }) {
     const page = usePage();
 
@@ -40,7 +42,9 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
 
     return (
         <SidebarGroup className="px-2 py-0">
-            <SidebarGroupLabel>Menu</SidebarGroupLabel>
+            <SidebarGroupLabel>
+                <span className="text-red-500 font-bold">{appName}</span>
+            </SidebarGroupLabel>
             <SidebarMenu>
                 {items.map((item) => (
                     <div key={item.title}>

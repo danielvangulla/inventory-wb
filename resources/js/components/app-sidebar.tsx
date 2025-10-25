@@ -4,7 +4,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { LayoutGrid, Store, ArrowBigRightDash, Settings2, Users, Monitor, ChartAreaIcon, BoxIcon } from 'lucide-react';
+import { ArrowBigRightDash, Settings2, Users, Monitor, ChartAreaIcon, BoxIcon } from 'lucide-react';
 import AppLogo from './app-logo';
 
 export function AppSidebar() {
@@ -120,6 +120,11 @@ export function AppSidebar() {
                     icon: ArrowBigRightDash,
                 },
                 {
+                    title: 'Hutang',
+                    href: '/inventory/hutang',
+                    icon: ArrowBigRightDash,
+                },
+                {
                     title: 'Keluar Gudang',
                     href: '/inventory/keluar-gudang',
                     icon: ArrowBigRightDash,
@@ -138,39 +143,44 @@ export function AppSidebar() {
         });
     }
 
-    const subItemsLaporan = [];
-
-    if (level.is_admin) {
-        subItemsLaporan.push(
-                {
-                    title: 'Omset Tenant',
-                    href: '/inventory/rekap-omset-tenant',
-                    icon: ArrowBigRightDash,
-                },
-        );
-    }
-
     if (level.laporan) {
-        subItemsLaporan.push(
-            {
-                title: 'Omset Harian',
-                href: '/inventory/rekap-omset-harian',
-                icon: ArrowBigRightDash,
-            },
-            {
-                title: 'Penjualan by Item',
-                href: '/inventory/penjualan-by-item',
-                icon: ArrowBigRightDash,
-            }
-        );
-    }
-
-    if (level.laporan || level.is_admin) {
-        mainNavItems.push({
+        mainNavItems.push(
+        {
             title: 'Laporan',
             href: '#',
             icon: ChartAreaIcon,
-            subItems: subItemsLaporan,
+            subItems: [
+                {
+                    title: 'Pembelian',
+                    href: '/inventory/laporan-pembelian',
+                    icon: ArrowBigRightDash,
+                },
+                {
+                    title: 'Barang Keluar',
+                    href: '/inventory/laporan-barang-keluar',
+                    icon: ArrowBigRightDash,
+                },
+                {
+                    title: 'Barang Rusak',
+                    href: '/inventory/laporan-barang-rusak',
+                    icon: ArrowBigRightDash,
+                },
+                {
+                    title: 'Hutang',
+                    href: '/inventory/laporan-hutang',
+                    icon: ArrowBigRightDash,
+                },
+                {
+                    title: 'Pembayaran Hutang',
+                    href: '/inventory/laporan-pembayaran-hutang',
+                    icon: ArrowBigRightDash,
+                },
+                {
+                    title: 'Stok Opname',
+                    href: '/inventory/laporan-stok-opname',
+                    icon: ArrowBigRightDash,
+                },
+            ],
         });
     }
 

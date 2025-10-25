@@ -93,6 +93,7 @@ class GudangMasukController extends Controller
         if ($validatedData['jenis_bayar'] == 1) {
             $validatedData['due'] = $validatedData['tgl'];
             $validatedData['tgl_lunas'] = $validatedData['tgl'];
+            $validatedData['is_lunas'] = 1;
         }
 
         $gudangMasuk = GudangMasuk::create($validatedData);

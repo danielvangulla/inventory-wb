@@ -32,6 +32,12 @@ class GudangMasuk extends Model
         'deleted_at',
     ];
 
+    protected $casts = [
+        'tgl' => 'date:Y-m-d',
+        'due' => 'date:Y-m-d',
+        'is_lunas' => 'boolean',
+    ];
+
     protected static function booted()
     {
         static::addGlobalScope('urut', function (Builder $builder) {
