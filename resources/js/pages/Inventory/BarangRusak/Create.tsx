@@ -3,29 +3,21 @@ import React, { useEffect, useState } from "react";
 import Select from "react-select";
 import AppLayout from "@/layouts/app-layout";
 import { Head, router } from "@inertiajs/react";
-import { Barang, GudangMasuk, GudangMasukDetail, Supplier } from "../../models";
 import { formatDigit } from "@/pages/components/helpers";
 import { Trash2 } from "lucide-react";
+import { Barang, BarangRusak, BarangRusakDetail, Supplier } from "../models";
 
 interface Props {
     barangs: Barang[];
     suppliers: Supplier[];
 }
 
-const initialFormData: GudangMasuk = {
+const initialFormData: BarangRusak = {
     id: 0,
     tgl: new Date().toISOString().split("T")[0],
     supplier_id: 0,
     penerima: "",
-    brutto: 0,
-    disc: 0,
-    netto: 0,
-    tax: 0,
     total: 0,
-    jenis_bayar: "",
-    due: new Date().toISOString().split("T")[0],
-    is_lunas: false,
-    tgl_lunas: "",
     details: [],
 };
 
@@ -37,7 +29,7 @@ const Create: React.FC<Props> = ({ barangs, suppliers }) => {
         },
     ];
 
-    const [formData, setFormData] = useState<GudangMasuk>(initialFormData);
+    const [formData, setFormData] = useState<BarangRusak>(initialFormData);
 
     // Supplier Select State
     const supplierOptions = suppliers.map((v: any) => ({
@@ -63,20 +55,15 @@ const Create: React.FC<Props> = ({ barangs, suppliers }) => {
 
     const handleBarangOptionChange = (option: any) => {
         setSelectedBarangOption(option);
-        // Additional logic to handle selected barang can be added here
+        setItem({ ...item!, harga: option.data.harga_beli });
     };
 
     // New Item State
-    const [item, setItem] = useState<GudangMasukDetail | null>(null);
+    const [item, setItem] = useState<BarangRusakDetail | null>(null);
 
     const handleItemQtyChange = (value: string) => {
         const qty = +parseFloat(value).toFixed(2);
         setItem({ ...item!, qty });
-    };
-
-    const handleItemHargaChange = (value: string) => {
-        const harga = +parseFloat(value).toFixed(2);
-        setItem({ ...item!, harga });
     };
 
     // trigger handleAddItem when user hit enter key on harga input
@@ -125,25 +112,17 @@ const Create: React.FC<Props> = ({ barangs, suppliers }) => {
         const tax = netto / 100 * 0; // default tax 0%
         const total = netto + tax - disc;
 
-        const newDetail: GudangMasukDetail = {
+        const newDetail: BarangRusakDetail = {
             id: 0,
-            gudang_masuk_id: 0,
+            barang_rusak_id: 0,
             barang_id: selectedBarangOption.value,
             qty,
             harga,
-            brutto,
-            disc,
-            netto,
-            tax,
             total,
         };
 
         setFormData((prev) => ({
             ...prev,
-            brutto: prev.brutto + brutto,
-            disc: prev.disc + disc,
-            netto: prev.netto + netto,
-            tax: prev.tax + tax,
             total: prev.total + total,
             details: [...prev.details!, newDetail],
         }));
@@ -159,10 +138,6 @@ const Create: React.FC<Props> = ({ barangs, suppliers }) => {
 
         setFormData((prev) => ({
             ...prev,
-            brutto: prev.brutto - detailToRemove.brutto,
-            disc: prev.disc - detailToRemove.disc,
-            netto: prev.netto - detailToRemove.netto,
-            tax: prev.tax - detailToRemove.tax,
             total: prev.total - detailToRemove.total,
             details: prev.details!.filter((_, i) => i !== index),
         }));
@@ -183,18 +158,13 @@ const Create: React.FC<Props> = ({ barangs, suppliers }) => {
             return;
         }
 
-        if (formData.penerima.trim() === "") {
-            setError("Silahkan isi penerima..");
-            return;
-        }
-
         if (formData.supplier_id === 0) {
             setError("Silahkan pilih supplier..");
             return;
         }
 
-        if (formData.jenis_bayar.trim() === "") {
-            setError("Silahkan pilih jenis bayar..");
+        if (formData.penerima.trim() === "") {
+            setError("Silahkan isi penerima..");
             return;
         }
 
@@ -212,28 +182,16 @@ const Create: React.FC<Props> = ({ barangs, suppliers }) => {
                 tgl: formData.tgl,
                 supplier_id: formData.supplier_id,
                 penerima: formData.penerima,
-                brutto: formData.brutto,
-                disc: formData.disc,
-                netto: formData.netto,
-                tax: formData.tax,
                 total: formData.total,
-                jenis_bayar: formData.jenis_bayar,
-                due: formData.due,
-                is_lunas: formData.is_lunas,
-                tgl_lunas: formData.tgl_lunas,
                 details: formData.details?.map((detail) => ({
                     barang_id: detail.barang_id,
                     qty: detail.qty,
                     harga: detail.harga,
-                    brutto: detail.brutto,
-                    disc: detail.disc,
-                    netto: detail.netto,
-                    tax: detail.tax,
                     total: detail.total,
                 })),
             };
 
-            router.post(route("inventory.terima-gudang.store"), payload, {
+            router.post(route("inventory.barang-rusak.store"), payload, {
                 onSuccess: () => {
                     setSuccess(true);
                     setFormData(initialFormData);
@@ -269,7 +227,7 @@ const Create: React.FC<Props> = ({ barangs, suppliers }) => {
 
             <div className="container mx-auto p-4">
                 <div className="mb-6 flex flex-row items-center pt-2">
-                    <h1 className="pl-2 text-2xl font-bold">Buat Penerimaan Gudang</h1>
+                    <h1 className="pl-2 text-2xl font-bold">Input Barang Rusak</h1>
                 </div>
 
                 <div className="space-y-0 bg-slate-200 p-2 rounded shadow">
@@ -277,9 +235,9 @@ const Create: React.FC<Props> = ({ barangs, suppliers }) => {
                     <div className="flex flex-col justify-center gap-1 py-1 bg-blue-200 dark:bg-gray-700 rounded-t-lg border-1 border-black dark:border-gray-600">
 
                         <div className="flex flex-col md:flex-row justify-center gap-2 py-1 px-2">
-                            {/* Tanggal Terima */}
+                            {/* Tanggal Rusak */}
                             <div className="flex flex-col md:min-w-48 max-w-full">
-                                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 pl-1">Tanggal Terima</label>
+                                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 pl-1">Tanggal Rusak</label>
                                 <input
                                     type="date"
                                     value={formData.tgl}
@@ -288,20 +246,6 @@ const Create: React.FC<Props> = ({ barangs, suppliers }) => {
                                 />
                             </div>
 
-                            {/* Nama Penerima */}
-                            <div className="flex flex-col md:min-w-48 max-w-full">
-                                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 pl-1">Nama Penerima</label>
-                                <input
-                                    type="text"
-                                    value={formData.penerima}
-                                    onChange={(e => setFormData({ ...formData, penerima: e.target.value }))}
-                                    className="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-white p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
-                            </div>
-
-                        </div>
-
-                        <div className="flex flex-col lg:flex-row justify-center gap-4 py-1 px-2">
                             {/* Supplier */}
                             <div className="flex flex-col md:min-w-60 max-w-full">
                                 <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 pl-1">
@@ -319,33 +263,18 @@ const Create: React.FC<Props> = ({ barangs, suppliers }) => {
                                 />
                             </div>
 
-                            {/* Jenis Bayar */}
-                            <div className="flex flex-col md:min-w-60 max-w-full">
-                                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 pl-1">Jenis Bayar</label>
-                                <select
-                                    value={formData.jenis_bayar}
-                                    onChange={(e => setFormData({ ...formData, jenis_bayar: e.target.value }))}
-                                    className="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-white p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                >
-                                    <option className="italic" value="">=== Pilih Jenis Bayar ===</option>
-                                    <option value="1">Tunai</option>
-                                    <option value="0">Kredit</option>
-                                </select>
-                            </div>
-
-                            {/* Jatuh Tempo */}
+                            {/* Nama Penerima */}
                             <div className="flex flex-col md:min-w-48 max-w-full">
-                                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 pl-1">Jatuh Tempo</label>
+                                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 pl-1">Nama Penerima</label>
                                 <input
-                                    type="date"
-                                    value={formData.due}
-                                    onChange={(e => setFormData({ ...formData, due: e.target.value }))}
+                                    type="text"
+                                    value={formData.penerima}
+                                    onChange={(e => setFormData({ ...formData, penerima: e.target.value }))}
                                     className="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-white p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 />
                             </div>
 
                         </div>
-
                     </div>
 
                     <div className="flex flex-row justify-center items-center overflow-x-auto">
@@ -430,7 +359,7 @@ const Create: React.FC<Props> = ({ barangs, suppliers }) => {
                                 />
                             </div>
 
-                            <div className="flex flex-row lg:flex-col items-center lg:items-start justify-center gap-2 lg:gap-0 md:min-w-24 max-w-full bg-gray-100 p-1 rounded-lg">
+                            <div className="flex flex-row lg:flex-col items-center lg:items-start justify-center gap-2 lg:gap-0 md:min-w-24 max-w-full bg-gray-300 p-1 rounded-lg">
                                 <label className="text-gray-700 dark:text-gray-300 mb-1 pl-1">
                                     Harga
                                     <span className="text-red-500 italic ml-1">{selectedBarangOption?.data.satuan ? `(per ${selectedBarangOption?.data.satuan || ''})` : ''}</span>
@@ -439,8 +368,9 @@ const Create: React.FC<Props> = ({ barangs, suppliers }) => {
                                     type="text"
                                     placeholder="Harga"
                                     value={formatDigit(item?.harga || 0, 2)}
-                                    onChange={(e) => handleItemHargaChange(e.target.value)}
-                                    className="bg-white border border-gray-300 rounded-lg px-2 h-9 py-1 text-center"
+                                    onChange={() => {}}
+                                    className="bg-gray-200 border border-gray-300 rounded-lg px-2 h-9 py-1 text-center cursor-not-allowed"
+                                    disabled={true}
                                 />
                             </div>
 

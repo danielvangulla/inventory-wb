@@ -12,15 +12,10 @@ class BarangRusak extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'deskripsi',
-        'kategori_id',
-        'kategorisub_id',
-        'stok',
-        'min_stok',
-        'satuan',
-        'isi',
-        'harga_beli',
-        'harga_jual',
+        'tgl',
+        'supplier_id',
+        'penerima',
+        'total',
     ];
 
     protected $hidden = [
@@ -32,17 +27,17 @@ class BarangRusak extends Model
     protected static function booted()
     {
         static::addGlobalScope('urut', function (Builder $builder) {
-            $builder->orderBy('deskripsi');
+            $builder->orderBy('tgl', 'desc');
         });
     }
 
-    public function kategori()
+    public function supplier()
     {
-        return $this->belongsTo(Kategori::class);
+        return $this->belongsTo(Supplier::class, 'supplier_id', 'id');
     }
 
-    public function kategorisub()
+    public function details()
     {
-        return $this->belongsTo(Kategorisub::class);
+        return $this->hasMany(BarangRusakDet::class, 'barang_rusak_id', 'id');
     }
 }

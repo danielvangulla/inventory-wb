@@ -122,3 +122,24 @@ export interface GudangKeluarDetail {
     gudang_keluar?: GudangKeluar;
     barang?: Barang;
 }
+
+export interface BarangRusak {
+    id: number;
+    tgl: string;
+    supplier_id: number;
+    penerima: string;
+    total: number;
+    details?: BarangRusakDetail[];
+    supplier?: Supplier;
+}
+
+export interface BarangRusakDetail {
+    id: number;
+    barang_rusak_id: number;
+    barang_id: number;
+    qty: number;
+    harga: number;
+    total: number;
+    barang?: Barang;
+    barang_rusak?: BarangRusak;
+}

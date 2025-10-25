@@ -25,6 +25,11 @@ class BarangRusakDet extends Model
         'deleted_at',
     ];
 
+    public function barang()
+    {
+        return $this->belongsTo(Barang::class);
+    }
+
     public function barangRusak()
     {
         return $this->belongsTo(BarangRusak::class);
