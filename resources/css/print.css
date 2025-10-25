@@ -1,0 +1,39 @@
+/* A4 Print styles */
+@media print {
+    body {
+        font-size: 12pt;
+        margin: 0;
+        padding: 0;
+    }
+
+    @page {
+        size: A4;
+        margin: 10mm;
+    }
+
+    .w-full {
+        width: 100%;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th, td {
+        padding: 0 5px 0 5px;
+        border: 1px solid #ddd;
+    }
+
+    .page-break {
+        page-break-before: always;
+    }
+
+    .no-print {
+        display: none;
+    }
+
+    th, td {
+        font-size: 9pt;
+    }
+}

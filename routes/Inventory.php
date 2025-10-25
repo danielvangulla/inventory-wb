@@ -53,4 +53,11 @@ Route::group(['prefix' => 'inventory', 'as' => 'inventory.'], function () {
 
     // Reports
     Route::get('laporan-pembelian', [LaporanController::class, 'laporanPembelian'])->name('laporan-pembelian');
+    Route::get('laporan-pembelian/{tgl1}/{tgl2}/{barangId}/{supplierId}/{kategoriId}/{kategorisubId}',
+        [LaporanController::class, 'laporanPembelian']
+    )->name('laporan-pembelian');
+
+    Route::get('laporan-pembelian-print/{tgl1}/{tgl2}/{barangId}/{supplierId}/{kategoriId}/{kategorisubId}',
+        [LaporanController::class, 'laporanPembelianPrint']
+    )->name('laporan-pembelian');
 });
