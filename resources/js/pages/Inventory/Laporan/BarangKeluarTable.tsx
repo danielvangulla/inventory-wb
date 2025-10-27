@@ -33,8 +33,8 @@ const BarangKeluarTable: React.FC<Props> = ({ filteredData }) => {
             {filteredData.length > 0 && filteredData.map((v, index) => (
                 <tr key={v.id} className='hover:bg-blue-300 dark:hover:bg-gray-600'>
                     <td className="py-2 px-2 text-center border border-black dark:border-gray-400">{index + 1}</td>
-                    <td className="py-2 px-2 text-center border border-black dark:border-gray-400">{formatTgl(v.gudang_keluar?.tgl || '')}</td>
-                    <td className="py-2 px-2 text-left border border-black dark:border-gray-400">{v.gudang_keluar?.outlet?.nama}</td>
+                    <td className="py-2 px-2 text-center border border-black dark:border-gray-400 whitespace-nowrap">{formatTgl(v.gudang_keluar?.tgl || '')}</td>
+                    <td className="py-2 px-2 text-left border border-black dark:border-gray-400 whitespace-nowrap">{v.gudang_keluar?.outlet?.nama}</td>
                     <td className="py-2 px-2 text-left border border-black dark:border-gray-400 whitespace-nowrap text-xs font-mono">
                         <div className="flex flex-row">
                             <div className='w-20'>Menyerahkan</div>
@@ -49,7 +49,7 @@ const BarangKeluarTable: React.FC<Props> = ({ filteredData }) => {
                             <div className="">: {v.gudang_keluar?.mengantar}</div>
                         </div>
                     </td>
-                    <td className="py-2 px-2 text-left border border-black dark:border-gray-400">
+                    <td className="py-2 px-2 text-left border border-black dark:border-gray-400 whitespace-nowrap">
                         <span className='text-xs italic'>{v.barang?.kategori?.ket} / {v.barang?.kategorisub?.ket}</span>
                         <br />
                         {v.barang?.deskripsi}

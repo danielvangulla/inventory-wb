@@ -172,7 +172,7 @@ export function AppSidebar() {
                 },
                 {
                     title: 'Pembayaran Hutang',
-                    href: '/inventory/laporan-pembayaran-hutang',
+                    href: '/inventory/laporan-hutang-lunas',
                     icon: ArrowBigRightDash,
                 },
                 {

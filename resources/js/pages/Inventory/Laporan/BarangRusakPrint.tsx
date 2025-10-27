@@ -1,35 +1,35 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { formatTgl } from '@/pages/components/functions';
-import { Barang, GudangMasukDetail, Kategori, Supplier } from '../models';
-import PembelianTable from './PembelianTable';
+import { Barang, BarangRusakDetail, Kategori, Supplier } from '../models';
+import BarangRusakTable from './BarangRusakTable';
 
 interface Props {
-    data: GudangMasukDetail[];
+    data: BarangRusakDetail[];
     barangs: Barang[];
     suppliers: Supplier[];
     kategoris: Kategori[];
     params: any[];
 }
 
-const PembelianPrint: React.FC<Props> = ({ data, barangs, suppliers, kategoris, params }) => {
+const BarangRusakPrint: React.FC<Props> = ({ data, barangs, suppliers, kategoris, params }) => {
     const kategorisub = kategoris.find(k => k.id == params[4])?.kategorisubs || [];
 
-    const filterByBarang = (currentData: GudangMasukDetail[], barangId: number) => {
+    const filterByBarang = (currentData: BarangRusakDetail[], barangId: number) => {
         if (barangId == 0) return currentData;
         return currentData.filter(item => item.barang_id == barangId);
     }
 
-    const filterBySupplier = (currentData: GudangMasukDetail[], supplierId: number) => {
+    const filterBySupplier = (currentData: BarangRusakDetail[], supplierId: number) => {
         if (supplierId == 0) return currentData;
-        return currentData.filter(item => item.gudang_masuk?.supplier_id == supplierId);
+        return currentData.filter(item => item.barang_rusak?.supplier_id == supplierId);
     };
 
-    const filterByKategori = (currentData: GudangMasukDetail[], kategoriId: number) => {
+    const filterByKategori = (currentData: BarangRusakDetail[], kategoriId: number) => {
         if (kategoriId == 0) return currentData;
         return currentData.filter(item => item.barang?.kategori_id == kategoriId);
     };
 
-    const filterByKategorisub = (currentData: GudangMasukDetail[], kategorisubId: number) => {
+    const filterByKategorisub = (currentData: BarangRusakDetail[], kategorisubId: number) => {
         if (kategorisubId == 0) return currentData;
         return currentData.filter(item => item.barang?.kategorisub_id == kategorisubId);
     };
@@ -84,10 +84,10 @@ const PembelianPrint: React.FC<Props> = ({ data, barangs, suppliers, kategoris, 
             </div>
 
             <div className="w-full overflow-x-auto h-full text-sm mt-4">
-                <PembelianTable filteredData={filteredData} />
+                <BarangRusakTable filteredData={filteredData} />
             </div>
         </div>
     );
 };
 
-export default PembelianPrint;
+export default BarangRusakPrint;

@@ -11,9 +11,7 @@ interface Props {
     params: any[];
 }
 
-const LaporanPembelian: React.FC<Props> = ({ data, barangs, outlets, kategoris, params }) => {
-    console.log({data, params});
-
+const BarangKeluarPrint: React.FC<Props> = ({ data, barangs, outlets, kategoris, params }) => {
     const kategorisub = kategoris.find(k => k.id == params[4])?.kategorisubs || [];
 
     const filterByBarang = (currentData: GudangKeluarDetail[], barangId: number) => {
@@ -92,4 +90,4 @@ const LaporanPembelian: React.FC<Props> = ({ data, barangs, outlets, kategoris, 
     );
 };
 
-export default LaporanPembelian;
+export default BarangKeluarPrint;

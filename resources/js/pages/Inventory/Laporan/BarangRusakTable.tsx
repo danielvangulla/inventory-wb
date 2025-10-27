@@ -1,20 +1,20 @@
 import React from 'react'
-import { GudangMasukDetail } from '../models';
+import { BarangRusakDetail } from '../models';
 import { formatTgl } from '@/pages/components/functions';
 import { formatDigit } from '@/pages/components/helpers';
 
 interface Props {
-    filteredData: GudangMasukDetail[];
+    filteredData: BarangRusakDetail[];
 }
 
-const PembelianTable: React.FC<Props> = ({ filteredData }) => {
+const BarangRusakTable: React.FC<Props> = ({ filteredData }) => {
     return (
         <table className="bg-white shadow-md rounded-md min-w-full">
             <thead>
                 <tr className="bg-gray-300 border border-gray-300 dark:border-gray-600">
                     <th className="py-2 px-2 text-center border border-black dark:border-gray-400">#</th>
                     <th className="py-2 px-2 text-center border border-black dark:border-gray-400">Tanggal</th>
-                    <th className="py-2 px-2 text-center border border-black dark:border-gray-400">Supplier</th>
+                    <th className="py-2 px-2 text-center border border-black dark:border-gray-400">Supplier / <br />Penerima</th>
                     <th className="py-2 px-2 text-center border border-black dark:border-gray-400">Deskripsi</th>
                     <th className="py-2 px-2 text-center border border-black dark:border-gray-400">Harga</th>
                     <th className="py-2 px-2 text-center border border-black dark:border-gray-400">Qty</th>
@@ -33,8 +33,11 @@ const PembelianTable: React.FC<Props> = ({ filteredData }) => {
                 {filteredData.length > 0 && filteredData.map((v, index) => (
                     <tr key={v.id} className='hover:bg-blue-300 dark:hover:bg-gray-600'>
                         <td className="py-2 px-2 text-center border border-black dark:border-gray-400">{index + 1}</td>
-                        <td className="py-2 px-2 text-center border border-black dark:border-gray-400 whitespace-nowrap">{formatTgl(v.gudang_masuk?.tgl || '')}</td>
-                        <td className="py-2 px-2 text-left border border-black dark:border-gray-400 whitespace-nowrap">{v.gudang_masuk?.supplier?.nama}</td>
+                        <td className="py-2 px-2 text-center border border-black dark:border-gray-400 whitespace-nowrap">{formatTgl(v.barang_rusak?.tgl || '')}</td>
+                        <td className="py-2 px-2 text-left border border-black dark:border-gray-400 whitespace-nowrap">
+                            {v.barang_rusak?.supplier?.nama} <br />
+                            <span className='font-light italic text-xs pl-4 '>by: {v.barang_rusak?.penerima}</span>
+                        </td>
                         <td className="py-2 px-2 text-left border border-black dark:border-gray-400 whitespace-nowrap">
                             <span className='text-xs italic'>{v.barang?.kategori?.ket} / {v.barang?.kategorisub?.ket}</span>
                             <br />
@@ -60,4 +63,4 @@ const PembelianTable: React.FC<Props> = ({ filteredData }) => {
     )
 }
 
-export default PembelianTable
+export default BarangRusakTable

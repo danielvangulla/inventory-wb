@@ -436,9 +436,9 @@ const Create: React.FC<Props> = ({ barangs, suppliers }) => {
                                     <span className="text-red-500 italic ml-1">{selectedBarangOption?.data.satuan ? `(per ${selectedBarangOption?.data.satuan || ''})` : ''}</span>
                                 </label>
                                 <input
-                                    type="text"
+                                    type="number"
                                     placeholder="Harga"
-                                    value={formatDigit(item?.harga || 0, 2)}
+                                    value={item?.harga || ""}
                                     onChange={(e) => handleItemHargaChange(e.target.value)}
                                     className="bg-white border border-gray-300 rounded-lg px-2 h-9 py-1 text-center"
                                 />
@@ -452,7 +452,7 @@ const Create: React.FC<Props> = ({ barangs, suppliers }) => {
                                 <input
                                     type="number"
                                     placeholder="Qty"
-                                    value={item?.qty || 0}
+                                    value={item?.qty || ""}
                                     onChange={(e) => handleItemQtyChange(e.target.value)}
                                     className="bg-white border border-gray-300 rounded-sm px-2 h-9 py-1 text-center"
                                 />

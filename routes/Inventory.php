@@ -64,4 +64,25 @@ Route::group(['prefix' => 'inventory', 'as' => 'inventory.'], function () {
     Route::get('laporan-barang-keluar-print/{tgl1}/{tgl2}/{barangId}/{outletId}/{kategoriId}/{kategorisubId}',
         [LaporanController::class, 'laporanBarangKeluarPrint']
     )->name('laporan-barang-keluar-print');
+
+    // Laporan Barang Rusak
+    Route::get('laporan-barang-rusak', [LaporanController::class, 'laporanBarangRusak'])->name('laporan-barang-rusak');
+    Route::post('laporan-barang-rusak', [LaporanController::class, 'laporanBarangRusakPost'])->name('laporan-barang-rusak');
+    Route::get('laporan-barang-rusak-print/{tgl1}/{tgl2}/{barangId}/{supplierId}/{kategoriId}/{kategorisubId}',
+        [LaporanController::class, 'laporanBarangRusakPrint']
+    )->name('laporan-barang-rusak-print');
+
+    // Laporan Hutang
+    Route::get('laporan-hutang', [LaporanController::class, 'laporanHutang'])->name('laporan-hutang');
+    Route::post('laporan-hutang', [LaporanController::class, 'laporanHutangPost'])->name('laporan-hutang');
+    Route::get('laporan-hutang-print/{tgl1}/{tgl2}/{supplierId}',
+        [LaporanController::class, 'laporanHutangPrint']
+    )->name('laporan-hutang-print');
+
+    // Laporan Hutang Lunas
+    Route::get('laporan-hutang-lunas', [LaporanController::class, 'laporanHutangLunas'])->name('laporan-hutang-lunas');
+    Route::post('laporan-hutang-lunas', [LaporanController::class, 'laporanHutangLunasPost'])->name('laporan-hutang-lunas');
+    Route::get('laporan-hutang-lunas-print/{tgl1}/{tgl2}/{supplierId}',
+        [LaporanController::class, 'laporanHutangLunasPrint']
+    )->name('laporan-hutang-lunas-print');
 });
