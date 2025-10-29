@@ -1,0 +1,20 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to server via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.PARAGON_HOST }}
+          username: ${{ secrets.PARAGON_USER }}
+          key: ${{ secrets.DANKEY }}
+          script: |
+            bash /home/apps/deploy-wb2.sh

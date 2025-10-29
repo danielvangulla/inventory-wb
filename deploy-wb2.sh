@@ -4,7 +4,7 @@
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
-cd /home/apps/foodcourt || exit 1
+cd /home/apps/inventory-wb2 || exit 1
 git reset --hard
 git pull origin main
 yes | composer update --no-interaction
