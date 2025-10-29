@@ -45,11 +45,11 @@ Route::group(['prefix' => 'inventory', 'as' => 'inventory.'], function () {
     Route::resource('outlets', OutletController::class)->names('outlets');
 
     // Transaction
-    Route::resource('terima-gudang', GudangMasukController::class)->names('terima-gudang')->only(['index', 'create', 'store', 'destroy']);
-    Route::resource('hutang', HutangController::class)->names('hutang')->only(['index', 'create', 'store', 'destroy']);
-    Route::resource('keluar-gudang', GudangKeluarController::class)->names('keluar-gudang')->only(['index', 'create', 'store', 'destroy']);
-    Route::resource('barang-rusak', BarangRusakController::class)->names('barang-rusak')->only(['index', 'create', 'store', 'destroy']);
-    Route::resource('stok-opname', StokOpnameController::class)->names('stok-opname')->only(['index', 'create', 'store', 'destroy']);
+    Route::resource('terima-gudang', GudangMasukController::class)->names('terima-gudang');
+    Route::resource('hutang', HutangController::class)->names('hutang');
+    Route::resource('keluar-gudang', GudangKeluarController::class)->names('keluar-gudang');
+    Route::resource('barang-rusak', BarangRusakController::class)->names('barang-rusak');
+    Route::resource('stok-opname', StokOpnameController::class)->names('stok-opname');
 
     // Laporan Pembelian
     Route::get('laporan-pembelian', [LaporanController::class, 'laporanPembelian'])->name('laporan-pembelian');

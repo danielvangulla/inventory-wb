@@ -37,6 +37,16 @@ class GudangMasukController extends Controller
         return redirect()->route("$this->route.index");
     }
 
+    public function show($id)
+    {
+        $data = GudangMasuk::with('details.barang', 'supplier')->findOrFail($id);
+
+        return inertia("$this->view/Print", [
+            'data' => $data,
+            'canWrite' => $this->checkAuth(),
+        ]);
+    }
+
     public function index()
     {
         $data = GudangMasuk::with('details.barang', 'supplier')->get();

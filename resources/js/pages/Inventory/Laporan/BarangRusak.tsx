@@ -7,6 +7,7 @@ import { BreadcrumbItem } from '@/types';
 import { PrinterCheck, Search } from 'lucide-react';
 import { Barang, BarangRusakDetail, Kategori, Supplier } from '../models';
 import BarangRusakTable from './BarangRusakTable';
+import { printWindow } from '../functions';
 
 interface Props {
     data: BarangRusakDetail[];
@@ -248,26 +249,15 @@ const LaporanBarangRusak: React.FC<Props> = ({ data, barangs, suppliers, kategor
     }
 
     const handlePrint = () => {
-        const printUrl = `/inventory/laporan-barang-rusak-print/${tglMulai}/${tglSelesai}/${selectedBarangOption?.value}/${selectedSupplierOption?.value}/${selectedKategoriOption?.value}/${selectedKategorisubOption?.value}`;
+        const p1 = tglMulai;
+        const p2 = tglSelesai;
+        const p3 = selectedBarangOption?.value || 0;
+        const p4 = selectedSupplierOption?.value || 0;
+        const p5 = selectedKategoriOption?.value || 0;
+        const p6 = selectedKategorisubOption?.value || 0;
 
-        const width = window.screen.width * 0.6;
-        const height = window.screen.height * 0.8;
-
-        const left = width - width * 0.7;
-        const top = height - height * 0.95;
-
-        const windowFeatures = `width=${width},height=${height},top=${top},left=${left},scrollbars=yes,resizable=yes,toolbar=no,menubar=no,location=no,status=no,directories=no,copyhistory=no,titlebar=no,fullscreen=no,channelmode=no,hotkeys=no,personalbar=no`;
-
-        const printWindow = window.open(printUrl, '_blank', windowFeatures);
-        if (printWindow) {
-            printWindow.focus();
-            printWindow.onload = () => {
-                setTimeout(() => {
-                    printWindow.print();
-                    printWindow.close();
-                }, 200);
-            }
-        }
+        const printUrl = `/inventory/laporan-barang-rusak-print/${p1}/${p2}/${p3}/${p4}/${p5}/${p6}`;
+        printWindow(printUrl);
     };
 
     return (

@@ -1,11 +1,12 @@
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
-import { Search, Trash2 } from 'lucide-react';
+import { PrinterCheckIcon, Search, Trash2 } from 'lucide-react';
 import { GudangMasuk } from '../../models';
 import { useState } from 'react';
 import { formatTgl } from '@/pages/components/functions';
 import { formatDigit } from '@/pages/components/helpers';
+import { printWindow } from '../../functions';
 
 interface Props {
     data: GudangMasuk[];
@@ -32,6 +33,11 @@ const Index: React.FC<Props> = ({ data, canWrite }) => {
         );
 
         setFilteredData(filtered);
+    };
+
+    const handlePrint = (id: number) => {
+        const printUrl = `/inventory/terima-gudang/${id}`;
+        printWindow(printUrl);
     };
 
     const handleDelete = (id: number) => {
@@ -122,11 +128,17 @@ const Index: React.FC<Props> = ({ data, canWrite }) => {
                                     <td className="py-2 px-2 text-center border border-black dark:border-gray-400">{v.jenis_bayar ? 'Tunai' : 'Kredit'}</td>
                                     <td className="py-2 px-2 text-center border border-black dark:border-gray-400">{formatTgl(v.due)}</td>
                                     <td className="py-2 px-1 text-center border border-black dark:border-gray-400">
-                                        <div className='flex flex-row justify-center gap-1'>
+                                        <div className='flex flex-row justify-center gap-0'>
+                                            <button
+                                                title={`Cetak ${v.penerima}`}
+                                                onClick={() => handlePrint(v.id)}
+                                                className="text-green-600 hover:text-green-800 cursor-pointer rounded-full p-1 hover:bg-gray-200">
+                                                <PrinterCheckIcon size={16} />
+                                            </button>
                                             <button
                                                 title={`Hapus Data ${v.penerima}`}
                                                 onClick={() => handleDelete(v.id)}
-                                                className="text-red-500 hover:text-red-700 cursor-pointer">
+                                                className="text-red-500 hover:text-red-700 cursor-pointer rounded-full p-1 hover:bg-gray-200">
                                                 <Trash2 size={16} />
                                             </button>
                                         </div>
