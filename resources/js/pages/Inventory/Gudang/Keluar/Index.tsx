@@ -1,11 +1,12 @@
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
-import { Search, Trash2 } from 'lucide-react';
+import { PrinterCheckIcon, Search, Trash2 } from 'lucide-react';
 import { GudangKeluar } from '../../models';
 import { useState } from 'react';
 import { formatTgl } from '@/pages/components/functions';
 import { formatDigit } from '@/pages/components/helpers';
+import { printWindow } from '../../functions';
 
 interface Props {
     data: GudangKeluar[];
@@ -34,6 +35,11 @@ const Index: React.FC<Props> = ({ data, canWrite }) => {
         );
 
         setFilteredData(filtered);
+    };
+
+    const handlePrint = (id: number, tipe: string) => {
+        const printUrl = `/inventory/keluar-gudang/${id}?tipe=${tipe}`;
+        printWindow(printUrl);
     };
 
     const handleDelete = (id: number) => {
@@ -134,12 +140,24 @@ const Index: React.FC<Props> = ({ data, canWrite }) => {
                                     </td>
                                     <td className="py-2 px-2 text-right border border-black dark:border-gray-400">{formatDigit(v.total, 2)}</td>
                                     <td className="py-2 px-2 text-center border border-black dark:border-gray-400">{formatTgl(v.created_at)}</td>
-                                    <td className="py-2 px-1 text-center border border-black dark:border-gray-400">
+                                    <td className="py-2 px-1 text-center border border-black dark:border-gray-400 w-20">
                                         <div className='flex flex-row justify-center gap-1'>
+                                            <button
+                                                title={`Cetak Nota`}
+                                                onClick={() => handlePrint(v.id, 'nota')}
+                                                className="text-orange-600 hover:text-orange-800 cursor-pointer rounded-full p-1 hover:bg-gray-200">
+                                                <PrinterCheckIcon size={16} />
+                                            </button>
+                                            <button
+                                                title={`Cetak Surat Jalan`}
+                                                onClick={() => handlePrint(v.id, 'surat-jalan')}
+                                                className="text-green-600 hover:text-green-800 cursor-pointer rounded-full p-1 hover:bg-gray-200">
+                                                <PrinterCheckIcon size={16} />
+                                            </button>
                                             <button
                                                 title={`Hapus Data untuk ${v.outlet?.nama || 'Transaksi ini'}`}
                                                 onClick={() => handleDelete(v.id)}
-                                                className="text-red-500 hover:text-red-700 cursor-pointer">
+                                                className="text-red-500 hover:text-red-700 cursor-pointer rounded-full p-1 hover:bg-gray-200">
                                                 <Trash2 size={16} />
                                             </button>
                                         </div>

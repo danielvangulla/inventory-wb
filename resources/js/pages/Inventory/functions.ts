@@ -14,7 +14,7 @@ export const printWindow = (url: string) => {
         printWindow.onload = () => {
             setTimeout(() => {
                 printWindow.print();
-                // printWindow.close();
+                printWindow.close();
             }, 200);
         }
     }

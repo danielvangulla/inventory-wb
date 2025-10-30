@@ -37,6 +37,21 @@ class GudangKeluarController extends Controller
         return redirect()->route("$this->route.index");
     }
 
+    public function show($id)
+    {
+        $r = request()->query('tipe');
+        $isNota = $r && $r === 'nota';
+
+        $data = GudangKeluar::with('details.barang', 'outlet')->findOrFail($id);
+
+        $tipe = $isNota ? 'Nota' : 'SuratJalan';
+
+        return inertia("$this->view/Print$tipe", [
+            'data' => $data,
+            'canWrite' => $this->checkAuth(),
+        ]);
+    }
+
     public function index()
     {
         $data = GudangKeluar::with('details.barang', 'outlet')->get();
